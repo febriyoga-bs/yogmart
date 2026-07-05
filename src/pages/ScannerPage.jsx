@@ -1,0 +1,187 @@
+import { useState, useCallback } from 'react'
+import { useTheme } from '../contexts/ThemeContext'
+import { useToast } from '../contexts/ToastContext'
+import { Card, Button, Input, Divider, EmptyState, Spinner } from '../components/ui'
+import { StockBadge } from '../components/domain'
+import { formatPrice } from '../utils/formatters'
+import { SEED_CATEGORIES } from '../utils/constants'
+
+/**
+ * Halaman cek harga via scan barcode / input manual
+ */
+export function ScannerPage({ products }) {
+  const { theme } = useTheme()
+  const C = theme.colors
+  const { showToast } = useToast()
+
+  const [mode, setMode] = useState('idle') // idle | scanning | loading | found | notfound
+  const [barcode, setBarcode] = useState('')
+  const [result, setResult] = useState(null)
+
+  const doSearch = useCallback((bc) => {
+    if (!bc.trim()) return
+    setMode('loading')
+    setTimeout(() => {
+      const found = products.find((p) => p.barcode === bc.trim())
+      setResult(found ?? null)
+      setMode(found ? 'found' : 'notfound')
+      if (!found) showToast(`Barcode "${bc}" tidak ditemukan`, 'warning')
+    }, 900)
+  }, [products, showToast])
+
+  const simulateScan = () => {
+    setMode('scanning')
+    setTimeout(() => {
+      const rnd = products[Math.floor(Math.random() * products.length)]
+      setBarcode(rnd.barcode)
+      doSearch(rnd.barcode)
+    }, 2200)
+  }
+
+  const reset = () => { setMode('idle'); setBarcode(''); setResult(null) }
+
+  const getCatIcon = (catId) => SEED_CATEGORIES.find((c) => c.id === catId)?.icon ?? '📦'
+
+  return (
+    <div style={{ minHeight: 'calc(100vh - 64px)', background: C.bg }}>
+      {/* Hero */}
+      <div style={{ background: C.heroGrad, padding: '36px 24px 40px', textAlign: 'center' }}>
+        <div style={{ fontSize: 44, marginBottom: 10 }}>📱</div>
+        <h1 style={{ fontSize: 34, color: 'white', fontWeight: 400, fontFamily: 'Georgia,serif', marginBottom: 8 }}>
+          Cek <em>Harga</em>
+        </h1>
+        <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 14 }}>Scan barcode atau masukkan kode produk</p>
+      </div>
+
+      <div style={{ maxWidth: 500, margin: '0 auto', padding: '28px 24px' }}>
+
+        {/* IDLE */}
+        {mode === 'idle' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14, animation: 'tk-fadeIn 0.3s ease' }}>
+            <Card>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ width: 68, height: 68, borderRadius: 18, background: C.bgMuted, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: 30 }}>📷</div>
+                <h3 style={{ fontSize: 18, fontWeight: 800, color: C.text, marginBottom: 8 }}>Scan Barcode</h3>
+                <p style={{ color: C.textMuted, fontSize: 14, marginBottom: 20 }}>Demo: pilih produk acak dari data</p>
+                <Button onClick={simulateScan} fullWidth size="lg" icon="📷">Buka Kamera (Demo)</Button>
+              </div>
+            </Card>
+
+            <Divider label="atau masukkan manual" />
+
+            <Card>
+              <h3 style={{ fontSize: 15, fontWeight: 700, color: C.text, marginBottom: 12 }}>Input Barcode</h3>
+              <div style={{ display: 'flex', gap: 10, marginBottom: 14 }}>
+                <div style={{ flex: 1 }}>
+                  <Input
+                    value={barcode}
+                    onChange={(e) => setBarcode(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && doSearch(barcode)}
+                    placeholder="Contoh: 8991234567890"
+                    style={{ fontFamily: 'monospace' }}
+                  />
+                </div>
+                <Button onClick={() => doSearch(barcode)} disabled={!barcode.trim()} icon="🔍">Cari</Button>
+              </div>
+
+              <div style={{ fontSize: 12, color: C.textMuted, marginBottom: 8, fontWeight: 600 }}>Contoh barcode:</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {products.slice(0, 5).map((p) => (
+                  <button key={p.id} onClick={() => { setBarcode(p.barcode); doSearch(p.barcode) }}
+                    style={{ padding: '4px 10px', borderRadius: 6, border: `1px solid ${C.border}`, background: C.bgMuted, fontSize: 11, fontFamily: 'monospace', cursor: 'pointer', color: C.textMuted, fontWeight: 600 }}>
+                    {p.barcode}
+                  </button>
+                ))}
+              </div>
+            </Card>
+          </div>
+        )}
+
+        {/* SCANNING */}
+        {mode === 'scanning' && (
+          <div style={{ animation: 'tk-fadeIn 0.3s ease' }}>
+            <div style={{ background: '#111', borderRadius: 20, overflow: 'hidden', aspectRatio: '4/3', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+              <div style={{ position: 'relative', width: 200, height: 130, zIndex: 2 }}>
+                {[['top','left','3px 0 0 3px'],['top','right','3px 3px 0 0'],['bottom','left','0 0 3px 3px'],['bottom','right','0 3px 3px 0']].map(([v,h,bw], i) => (
+                  <div key={i} style={{ position:'absolute', width:22, height:22, [v]:0, [h]:0, borderColor:C.accent, borderStyle:'solid', borderWidth:bw }}/>
+                ))}
+                <div style={{ position:'absolute', left:0, right:0, height:3, background:C.accent, borderRadius:2, animation:'tk-scanLine 1.8s ease-in-out infinite', boxShadow:`0 0 10px ${C.accent}` }}/>
+              </div>
+              <div style={{ position:'absolute', bottom:0, left:0, right:0, padding:'18px 20px 16px', background:'linear-gradient(transparent, rgba(0,0,0,0.7))', textAlign:'center' }}>
+                <p style={{ color:'white', fontWeight:600, fontSize:14 }}>Sedang memindai...</p>
+              </div>
+            </div>
+            <div style={{ marginTop: 14 }}>
+              <Button variant="secondary" onClick={reset} fullWidth>✕ Batal</Button>
+            </div>
+          </div>
+        )}
+
+        {/* LOADING */}
+        {mode === 'loading' && (
+          <div style={{ textAlign: 'center', padding: '80px 24px' }}>
+            <Spinner size={52} color={C.primary} />
+            <div style={{ marginTop: 20, fontWeight: 700, color: C.textMuted }}>Mencari produk...</div>
+          </div>
+        )}
+
+        {/* FOUND */}
+        {mode === 'found' && result && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14, animation: 'tk-fadeIn 0.4s ease' }}>
+            <Card padding="none" style={{ overflow: 'hidden' }}>
+              <div style={{ height: 120, background: C.heroGrad, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 56 }}>
+                {getCatIcon(result.category_id)}
+              </div>
+              <div style={{ padding: 22, display: 'flex', flexDirection: 'column', gap: 14 }}>
+                <div>
+                  <div style={{ fontSize: 12, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>Ditemukan</div>
+                  <h2 style={{ fontSize: 22, fontWeight: 800, color: C.text }}>{result.name}</h2>
+                  {result.description && <p style={{ fontSize: 14, color: C.textMuted, marginTop: 4 }}>{result.description}</p>}
+                </div>
+                {/* Price box */}
+                <div style={{ background: C.primary, borderRadius: 16, padding: '18px 22px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, fontWeight: 700 }}>HARGA</div>
+                    <div style={{ fontSize: 30, fontWeight: 800, color: 'white' }}>{formatPrice(result.price)}</div>
+                    <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13 }}>per {result.unit}</div>
+                  </div>
+                  <span style={{ fontSize: 40 }}>🏷️</span>
+                </div>
+                {/* Details */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  {[['Barcode', result.barcode, true], ['Satuan', result.unit, false]].map(([lbl, val, mono]) => (
+                    <div key={lbl} style={{ background: C.bgMuted, borderRadius: 10, padding: '10px 14px' }}>
+                      <div style={{ fontSize: 11, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>{lbl}</div>
+                      <div style={{ fontSize: 14, fontWeight: 700, marginTop: 2, fontFamily: mono ? 'monospace' : 'inherit', color: C.text }}>{val}</div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', borderRadius: 10, background: result.stock === 0 ? C.dangerBg : result.stock < 10 ? C.warningBg : C.successBg }}>
+                  <span style={{ fontSize: 18 }}>{result.stock === 0 ? '❌' : result.stock < 10 ? '⚠️' : '✅'}</span>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: result.stock === 0 ? C.danger : result.stock < 10 ? C.warning : C.success }}>
+                    {result.stock === 0 ? 'Stok Habis' : result.stock < 10 ? `Sisa ${result.stock} ${result.unit}` : `${result.stock} ${result.unit} tersedia`}
+                  </span>
+                </div>
+              </div>
+            </Card>
+            <Button variant="secondary" onClick={reset} fullWidth icon="🔄">Scan Lagi</Button>
+          </div>
+        )}
+
+        {/* NOT FOUND */}
+        {mode === 'notfound' && (
+          <div style={{ animation: 'tk-fadeIn 0.3s ease' }}>
+            <Card>
+              <EmptyState
+                icon="🔍"
+                title="Tidak Ditemukan"
+                description={`Barcode "${barcode}" tidak terdaftar di sistem`}
+                action={<Button onClick={reset} icon="🔄">Coba Lagi</Button>}
+              />
+            </Card>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}

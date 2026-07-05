@@ -1,0 +1,16 @@
+// ─── UI Components — barrel export ───────────────────────────────────────────
+// Import dari sini: import { Button, Card, Badge } from '../components/ui'
+
+export { Badge }           from './Badge'
+export { Button }          from './Button'
+export { Card }            from './Card'
+export { ConfirmDialog }   from './ConfirmDialog'
+export { Divider }         from './Divider'
+export { EmptyState }      from './EmptyState'
+export { FilterPill }      from './FilterPill'
+export { Input, Select, Textarea } from './Input'
+export { Modal }           from './Modal'
+export { SearchBar }       from './SearchBar'
+export { Skeleton }        from './Skeleton'
+export { Spinner }         from './Spinner'
+export { Tabs }            from './Tabs'
