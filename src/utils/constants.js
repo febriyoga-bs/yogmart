@@ -11,8 +11,8 @@ export const THEMES = {
     label: 'Light',
     icon: '☀️',
     colors: {
-      primary:       '#1a472a',
-      primaryLight:  '#2d6a4f',
+      primary:       '#070047',
+      primaryLight:  '#40577b',
       primaryDark:   '#0d2b1a',
       primaryAlpha:  'rgba(26,71,42,0.08)',
       accent:        '#e76f51',
@@ -36,7 +36,7 @@ export const THEMES = {
       infoBg:        '#dbeafe',
       shadow:        '0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06)',
       shadowLg:      '0 8px 30px rgba(0,0,0,0.12)',
-      heroGrad:      'linear-gradient(135deg, #0d2b1a 0%, #1a472a 60%, #2d6a4f 100%)',
+      heroGrad:      'linear-gradient(135deg, #40577b 0%, #070047 60%, #2d4d7a 100%)',
     },
   },
   dawn: {
@@ -77,9 +77,9 @@ export const THEMES = {
     label: 'Dark',
     icon: '🌙',
     colors: {
-      primary:       '#4ade80',
-      primaryLight:  '#86efac',
-      primaryDark:   '#22c55e',
+      primary:       '#070047',
+      primaryLight:  '#40577b',
+      primaryDark:   '#070047',
       primaryAlpha:  'rgba(74,222,128,0.1)',
       accent:        '#fb923c',
       accentLight:   '#fdba74',

@@ -19,7 +19,7 @@ export function Navbar({ page, setPage }) {
       boxShadow: `0 1px 12px rgba(0,0,0,${theme.name === 'dark' ? 0.4 : 0.05})`,
     }}>
       <div style={{
-        maxWidth: 1100, margin: '0 auto', padding: '0 24px',
+        maxWidth: "100vw", margin: '0 auto', padding: '0 24px', overflow: "auto",
         display: 'flex', alignItems: 'center', height: 64, gap: 16,
       }}>
         {/* Logo */}
@@ -27,7 +27,7 @@ export function Navbar({ page, setPage }) {
           <div style={{
             width: 38, height: 38, borderRadius: 10, background: C.primary,
             display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20,
-          }}>🛒</div>
+          }}><img src={"/image/icon.png"} width={50} height={50}/></div>
           <div>
             <div style={{ fontWeight: 800, fontSize: 15, color: C.primary, lineHeight: 1.1 }}>{APP_NAME}</div>
             <div style={{ fontSize: 11, color: C.textMuted, fontWeight: 500 }}>Katalog Digital</div>
@@ -47,7 +47,7 @@ export function Navbar({ page, setPage }) {
                 background: page === n.id ? C.primary : 'transparent',
                 color:      page === n.id ? 'white'   : C.textMuted,
               }}>
-              {n.icon} {n.label}
+              {n.label}
             </button>
           ))}
         </div>

@@ -1,7 +1,8 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { useTheme } from '../contexts/ThemeContext'
 import { useToast } from '../contexts/ToastContext'
 import { Card, Button, Input, Divider, EmptyState, Spinner } from '../components/ui'
+import { ScanBarcode, Camera, Search, RotateCcw, AlertCircle, CheckCircle } from 'lucide-react'
 import { StockBadge } from '../components/domain'
 import { formatPrice } from '../utils/formatters'
 import { SEED_CATEGORIES } from '../utils/constants'
@@ -18,6 +19,28 @@ export function ScannerPage({ products }) {
   const [barcode, setBarcode] = useState('')
   const [result, setResult] = useState(null)
 
+  const videoRef = useRef(null)
+  const streamRef = useRef(null)
+  const scannerRef = useRef(null)
+
+  const [manualBarcode, setManualBarcode] = useState('')
+  const [product, setProduct] = useState(null)
+
+  const stopCamera = useCallback(() => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(t => t.stop())
+      streamRef.current = null
+    }
+    if (scannerRef.current) {
+      clearInterval(scannerRef.current)
+      scannerRef.current = null
+    }
+  }, [])
+
+  useEffect(() => {
+    return () => stopCamera()
+  }, [stopCamera])
+
   const doSearch = useCallback((bc) => {
     if (!bc.trim()) return
     setMode('loading')
@@ -30,7 +53,7 @@ export function ScannerPage({ products }) {
   }, [products, showToast])
 
   const simulateScan = () => {
-    setMode('scanning')
+    setMode('simulation')
     setTimeout(() => {
       const rnd = products[Math.floor(Math.random() * products.length)]
       setBarcode(rnd.barcode)
@@ -38,7 +61,62 @@ export function ScannerPage({ products }) {
     }, 2200)
   }
 
-  const reset = () => { setMode('idle'); setBarcode(''); setResult(null) }
+  const startCamera = async () => {
+    setMode('scanning')
+    setProduct(null)
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
+      })
+      streamRef.current = stream
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream
+        videoRef.current.play()
+      }
+
+      // Use BarcodeDetector if available
+      if ('BarcodeDetector' in window) {
+        const detector = new window.BarcodeDetector({ formats: ['ean_13', 'ean_8', 'code_128', 'code_39', 'qr_code', 'upc_a', 'upc_e'] })
+        scannerRef.current = setInterval(async () => {
+          if (!videoRef.current) return
+          try {
+            const barcodes = await detector.detect(videoRef.current)
+            if (barcodes.length > 0) {
+              const barcode = barcodes[0].rawValue
+              stopCamera()
+              await fetchProduct(barcode)
+            }
+          } catch (e) { }
+        }, 300)
+      } else {
+        // Fallback: show manual entry hint
+        setTimeout(() => {
+          if (mode === 'scanning') {
+            setMode('manual')
+            stopCamera()
+          }
+        }, 2000)
+      }
+    } catch (e) {
+      setMode('error')
+      setErrorMsg('Tidak dapat mengakses kamera. Pastikan izin kamera sudah diberikan.')
+    }
+  }
+
+  const handleManualSubmit = (e) => {
+    e.preventDefault()
+    if (manualBarcode.trim()) {
+      fetchProduct(manualBarcode.trim())
+    }
+  }
+
+  const reset = () => {
+    stopCamera();
+    setMode('idle');
+    setProduct(null);
+    setBarcode('');
+    setResult(null)
+  }
 
   const getCatIcon = (catId) => SEED_CATEGORIES.find((c) => c.id === catId)?.icon ?? '📦'
 
@@ -62,8 +140,8 @@ export function ScannerPage({ products }) {
               <div style={{ textAlign: 'center' }}>
                 <div style={{ width: 68, height: 68, borderRadius: 18, background: C.bgMuted, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: 30 }}>📷</div>
                 <h3 style={{ fontSize: 18, fontWeight: 800, color: C.text, marginBottom: 8 }}>Scan Barcode</h3>
-                <p style={{ color: C.textMuted, fontSize: 14, marginBottom: 20 }}>Demo: pilih produk acak dari data</p>
-                <Button onClick={simulateScan} fullWidth size="lg" icon="📷">Buka Kamera (Demo)</Button>
+                <Button onClick={simulateScan} fullWidth size="lg">Simulasi</Button>
+                <Button onClick={startCamera} fullWidth size="lg" icon="📷" style={{marginTop: 10}}>Buka Kamera</Button>
               </div>
             </Card>
 
@@ -98,17 +176,60 @@ export function ScannerPage({ products }) {
         )}
 
         {/* SCANNING */}
-        {mode === 'scanning' && (
+        {mode === 'simulation' && (
           <div style={{ animation: 'tk-fadeIn 0.3s ease' }}>
             <div style={{ background: '#111', borderRadius: 20, overflow: 'hidden', aspectRatio: '4/3', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
               <div style={{ position: 'relative', width: 200, height: 130, zIndex: 2 }}>
-                {[['top','left','3px 0 0 3px'],['top','right','3px 3px 0 0'],['bottom','left','0 0 3px 3px'],['bottom','right','0 3px 3px 0']].map(([v,h,bw], i) => (
-                  <div key={i} style={{ position:'absolute', width:22, height:22, [v]:0, [h]:0, borderColor:C.accent, borderStyle:'solid', borderWidth:bw }}/>
+                {[['top', 'left', '3px 0 0 3px'], ['top', 'right', '3px 3px 0 0'], ['bottom', 'left', '0 0 3px 3px'], ['bottom', 'right', '0 3px 3px 0']].map(([v, h, bw], i) => (
+                  <div key={i} style={{ position: 'absolute', width: 22, height: 22, [v]: 0, [h]: 0, borderColor: C.accent, borderStyle: 'solid', borderWidth: bw }} />
                 ))}
-                <div style={{ position:'absolute', left:0, right:0, height:3, background:C.accent, borderRadius:2, animation:'tk-scanLine 1.8s ease-in-out infinite', boxShadow:`0 0 10px ${C.accent}` }}/>
+                <div style={{ position: 'absolute', left: 0, right: 0, height: 3, background: C.accent, borderRadius: 2, animation: 'tk-scanLine 1.8s ease-in-out infinite', boxShadow: `0 0 10px ${C.accent}` }} />
               </div>
-              <div style={{ position:'absolute', bottom:0, left:0, right:0, padding:'18px 20px 16px', background:'linear-gradient(transparent, rgba(0,0,0,0.7))', textAlign:'center' }}>
-                <p style={{ color:'white', fontWeight:600, fontSize:14 }}>Sedang memindai...</p>
+              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '18px 20px 16px', background: 'linear-gradient(transparent, rgba(0,0,0,0.7))', textAlign: 'center' }}>
+                <p style={{ color: 'white', fontWeight: 600, fontSize: 14 }}>Sedang memindai...</p>
+              </div>
+            </div>
+            <div style={{ marginTop: 14 }}>
+              <Button variant="secondary" onClick={reset} fullWidth>✕ Batal</Button>
+            </div>
+          </div>
+        )}
+
+        {/* Scanning */}
+        {mode === 'scanning' && (
+          <div style={{ animation: 'fadeIn 0.3s ease' }}>
+            <div style={{ background: 'black', borderRadius: 20, overflow: 'hidden', position: 'relative', aspectRatio: '4/3' }}>
+              <video ref={videoRef} style={{ width: '100%', height: '100%', objectFit: 'cover' }} playsInline muted />
+
+              {/* Scan overlay */}
+              <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ position: 'relative', width: 220, height: 140 }}>
+                  {/* Corner brackets */}
+                  {['top-left', 'top-right', 'bottom-left', 'bottom-right'].map(pos => (
+                    <div key={pos} style={{
+                      position: 'absolute',
+                      width: 24, height: 24,
+                      ...(pos.includes('top') ? { top: 0 } : { bottom: 0 }),
+                      ...(pos.includes('left') ? { left: 0 } : { right: 0 }),
+                      borderColor: 'var(--accent)', borderStyle: 'solid',
+                      borderWidth: pos.includes('top') ? '3px 0 0 3px' : pos === 'top-right' ? '3px 3px 0 0' : pos === 'bottom-left' ? '0 0 3px 3px' : '0 3px 3px 0',
+                    }} />
+                  ))}
+                  {/* Scan line */}
+                  <div style={{
+                    position: 'absolute', left: 0, right: 0, height: 2,
+                    background: 'var(--accent)', animation: 'scanLine 2s ease-in-out infinite',
+                    boxShadow: '0 0 8px var(--accent)'
+                  }} />
+                </div>
+              </div>
+
+              <div style={{
+                position: 'absolute', bottom: 0, left: 0, right: 0,
+                background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
+                padding: '20px 20px 16px', textAlign: 'center'
+              }}>
+                <p style={{ color: 'white', fontSize: 14, fontWeight: 600 }}>Arahkan kamera ke barcode produk</p>
               </div>
             </div>
             <div style={{ marginTop: 14 }}>
