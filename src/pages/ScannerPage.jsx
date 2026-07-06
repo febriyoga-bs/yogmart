@@ -265,8 +265,15 @@ export function ScannerPage() {
         {mode === 'found' && result && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14, animation: 'tk-fadeIn 0.4s ease' }}>
             <Card padding="none" style={{ overflow: 'hidden' }}>
-              <div style={{ height: 120, background: C.heroGrad, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 56 }}>
-                {getCatIcon(result.category_id)}
+              <div style={{ height: 150, background: C.heroGrad, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 56 }}>
+                {result?.image ?
+                  <img
+                    src={`/image/${result?.image}.png`}
+                    height={150}
+                  />
+                  :
+                  getCatIcon(result.category_id)
+                }
               </div>
               <div style={{ padding: 22, display: 'flex', flexDirection: 'column', gap: 14 }}>
                 <div>
