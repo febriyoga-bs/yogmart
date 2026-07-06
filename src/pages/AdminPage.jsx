@@ -10,10 +10,13 @@ import {
   StatCard, StockBadge, ProductFormModal, CategoryForm
 } from '../components/domain'
 import { Modal } from '../components/ui/Modal'
+import { useOutletContext } from "react-router-dom";
+import { productAPI } from "../api";
+
 
 const ADMIN_TABS = [
-  { id: 'products',   label: 'Produk',    icon: '📦' },
-  { id: 'categories', label: 'Kategori',  icon: '🏷️' },
+  { id: 'products', label: 'Produk', icon: '📦' },
+  { id: 'categories', label: 'Kategori', icon: '🏷️' },
 ]
 
 const EMPTY_PRODUCT = { name: '', barcode: '', price: '', stock: '', unit: 'buah', category_id: '', description: '' }
@@ -22,7 +25,7 @@ const EMPTY_CATEGORY = { name: '', icon: '📦' }
 /**
  * Halaman dashboard admin — kelola produk, kategori, statistik
  */
-export function AdminPage({ products, categories, dispatch, catDispatch }) {
+export function AdminPage() {
   const { theme } = useTheme()
   const C = theme.colors
   const { showToast } = useToast()
@@ -34,6 +37,12 @@ export function AdminPage({ products, categories, dispatch, catDispatch }) {
   const [catModal, setCatModal] = useState(null)
   const [confirm, setConfirm] = useState(null)
 
+  const {
+    products,
+    categories,
+    dispatch,
+    catDispatch
+  } = useOutletContext();
   const { filtered, total } = useProductFilter(products, { search, categoryId })
   const getCat = (id) => categories.find((c) => c.id === id)
 
@@ -44,18 +53,51 @@ export function AdminPage({ products, categories, dispatch, catDispatch }) {
     low: products.filter((p) => p.stock < 10).length,
   }
 
-  const saveProduct = (form) => {
-    const payload = { ...form, price: parseFloat(form.price) || 0, stock: parseInt(form.stock) || 0 }
-    if (payload.id) { dispatch({ type: 'UPDATE', payload }); showToast('Produk diupdate!') }
-    else            { dispatch({ type: 'ADD',    payload }); showToast('Produk ditambahkan!') }
-    setProductModal(null)
-  }
+  const saveProduct = async (form) => {
+    try {
+      const payload = {
+        ...form,
+        price: Number(form.price) || 0,
+        stock: Number(form.stock) || 0,
+      };
 
-  const saveCat = (form) => {
-    if (form.id) { catDispatch({ type: 'UPDATE', payload: form }); showToast('Kategori diupdate!') }
-    else         { catDispatch({ type: 'ADD',    payload: form }); showToast('Kategori ditambahkan!') }
-    setCatModal(null)
-  }
+      if (payload.id) {
+        await productAPI.update(payload.id, payload);
+        showToast("Produk berhasil diupdate!");
+      } else {
+        await productAPI.create({...payload, id: "p"+products.length+1});
+        showToast("Produk berhasil ditambahkan!");
+      }
+
+      console.log("SAVE")
+
+      setProductModal(null);
+    } catch (err) {
+      console.error(err);
+      showToast("Gagal menyimpan produk");
+    }
+  };
+
+  const saveCat = async (form) => {
+    try {
+      if (form.id) {
+        await categoryAPI.update(form.id, form);
+        showToast("Kategori berhasil diupdate!");
+      } else {
+        await categoryAPI.create(form);
+        showToast("Kategori berhasil ditambahkan!");
+      }
+
+      // Reload data dari database
+      const categories = await categoryAPI.getAll();
+      setCategories(categories);
+
+      setCatModal(null);
+    } catch (err) {
+      console.error(err);
+      showToast("Gagal menyimpan kategori");
+    }
+  };
 
   return (
     <div style={{ minHeight: 'calc(100vh - 64px)', background: C.bg }}>
@@ -70,10 +112,10 @@ export function AdminPage({ products, categories, dispatch, catDispatch }) {
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '24px' }}>
         {/* Stats */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(190px,1fr))', gap: 14, marginBottom: 24 }}>
-          <StatCard label="Total Produk"  value={stats.total}             icon="📦" variant="primary" />
-          <StatCard label="Kategori"      value={stats.cats}              icon="🏷️" variant="info" />
-          <StatCard label="Nilai Stok"    value={formatPrice(stats.value)} icon="💰" variant="success" />
-          <StatCard label="Stok Menipis"  value={stats.low}               icon="⚠️" variant={stats.low > 0 ? 'warning' : 'neutral'} />
+          <StatCard label="Total Produk" value={stats.total} icon="📦" variant="primary" />
+          <StatCard label="Kategori" value={stats.cats} icon="🏷️" variant="info" />
+          <StatCard label="Nilai Stok" value={formatPrice(stats.value)} icon="💰" variant="success" />
+          <StatCard label="Stok Menipis" value={stats.low} icon="⚠️" variant={stats.low > 0 ? 'warning' : 'neutral'} />
         </div>
 
         <Tabs tabs={ADMIN_TABS} active={tab} onChange={setTab} />

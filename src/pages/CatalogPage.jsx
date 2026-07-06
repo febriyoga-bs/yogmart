@@ -3,16 +3,21 @@ import { useProductFilter } from '../hooks/useProductFilter'
 import { SearchBar, FilterPill, EmptyState } from '../components/ui'
 import { ProductCard } from '../components/domain'
 import { useState } from 'react'
+import { useOutletContext } from "react-router-dom";
 
 /**
  * Halaman katalog publik — tampil grid produk, filter kategori & search
  */
-export function CatalogPage({ products, categories }) {
+export function CatalogPage() {
   const { theme } = useTheme()
   const C = theme.colors
   const [search, setSearch] = useState('')
   const [categoryId, setCategoryId] = useState('')
 
+  const {
+    products,
+    categories
+  } = useOutletContext();
   const { filtered, total, isEmpty } = useProductFilter(products, { search, categoryId })
   const getCat = (id) => categories.find((c) => c.id === id)
 

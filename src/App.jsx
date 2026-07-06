@@ -1,33 +1,29 @@
-import { useState, useReducer } from 'react'
-import { ThemeProvider, useTheme } from './contexts/ThemeContext'
-import { ToastProvider } from './contexts/ToastContext'
-import { Navbar } from './components/domain/Navbar'
-import { CatalogPage } from './pages/CatalogPage'
-import { ScannerPage } from './pages/ScannerPage'
-import { AdminPage } from './pages/AdminPage'
-import { productReducer, categoryReducer } from './utils/reducers'
-import { SEED_PRODUCTS, SEED_CATEGORIES } from './utils/constants'
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-function AppInner() {
-  const { theme } = useTheme()
-  const C = theme.colors
-  const [page, setPage] = useState('catalog')
-  const [products,   dispatch]    = useReducer(productReducer,  SEED_PRODUCTS)
-  const [categories, catDispatch] = useReducer(categoryReducer, SEED_CATEGORIES)
+import { ThemeProvider } from "./contexts/ThemeContext";
+import { ToastProvider } from "./contexts/ToastContext";
 
+import MainLayout from "./layouts/MainLayout";
+
+import { CatalogPage } from "./pages/CatalogPage";
+import { ScannerPage } from "./pages/ScannerPage";
+import { AdminPage } from "./pages/AdminPage";
+
+export default function App() {
   return (
-    <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", background: C.bg, minHeight: '100vh', color: C.text, transition: 'background 0.3s, color 0.3s' }}>
-      <Navbar page={page} setPage={setPage} />
+    <ThemeProvider>
+      <ToastProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route element={<MainLayout />}>
+              <Route path="/" element={<CatalogPage />} />
+              <Route path="/scanner" element={<ScannerPage />} />
+              <Route path="/admin" element={<AdminPage />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
 
-      {page === 'catalog' && <CatalogPage products={products} categories={categories} />}
-      {page === 'scan'    && <ScannerPage products={products} />}
-      {page === 'admin'   && <AdminPage   products={products} categories={categories} dispatch={dispatch} catDispatch={catDispatch} />}
-
-      <footer style={{ marginTop: 48, padding: 24, borderTop: `1px solid ${C.border}`, textAlign: 'center' }}>
-        <p style={{ color: C.textMuted, fontSize: 13 }}>© 2026 Warung Yoga · Katalog Digital </p>
-      </footer>
-
-      <style>{`
+        <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         ::-webkit-scrollbar { width: 5px; height: 5px; }
@@ -42,16 +38,7 @@ function AppInner() {
         @keyframes tk-shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
         @keyframes tk-scanLine { 0%, 100% { top: 10px; } 50% { top: calc(100% - 12px); } }
       `}</style>
-    </div>
-  )
-}
-
-export default function App() {
-  return (
-    <ThemeProvider>
-      <ToastProvider>
-        <AppInner />
       </ToastProvider>
     </ThemeProvider>
-  )
+  );
 }

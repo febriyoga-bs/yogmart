@@ -6,14 +6,19 @@ import { ScanBarcode, Camera, Search, RotateCcw, AlertCircle, CheckCircle } from
 import { StockBadge } from '../components/domain'
 import { formatPrice } from '../utils/formatters'
 import { SEED_CATEGORIES } from '../utils/constants'
+import { useOutletContext } from "react-router-dom";
 
 /**
  * Halaman cek harga via scan barcode / input manual
  */
-export function ScannerPage({ products }) {
+export function ScannerPage() {
   const { theme } = useTheme()
   const C = theme.colors
   const { showToast } = useToast()
+  const {
+    products,
+    categories
+  } = useOutletContext();
 
   const [mode, setMode] = useState('idle') // idle | scanning | loading | found | notfound
   const [barcode, setBarcode] = useState('')
@@ -141,7 +146,7 @@ export function ScannerPage({ products }) {
                 <div style={{ width: 68, height: 68, borderRadius: 18, background: C.bgMuted, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: 30 }}>📷</div>
                 <h3 style={{ fontSize: 18, fontWeight: 800, color: C.text, marginBottom: 8 }}>Scan Barcode</h3>
                 <Button onClick={simulateScan} fullWidth size="lg">Simulasi</Button>
-                <Button onClick={startCamera} fullWidth size="lg" icon="📷" style={{marginTop: 10}}>Buka Kamera</Button>
+                <Button onClick={startCamera} fullWidth size="lg" icon="📷" style={{ marginTop: 10 }}>Buka Kamera</Button>
               </div>
             </Card>
 
