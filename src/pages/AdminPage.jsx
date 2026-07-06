@@ -11,7 +11,7 @@ import {
 } from '../components/domain'
 import { Modal } from '../components/ui/Modal'
 import { useOutletContext } from "react-router-dom";
-import { productAPI } from "../api";
+import { productAPI, categoryAPI } from "../api";
 
 
 const ADMIN_TABS = [
@@ -39,10 +39,13 @@ export function AdminPage() {
 
   const {
     products,
+    loadProducts,
     categories,
+    loadCategories,
     dispatch,
     catDispatch
   } = useOutletContext();
+  
   const { filtered, total } = useProductFilter(products, { search, categoryId })
   const getCat = (id) => categories.find((c) => c.id === id)
 
@@ -59,17 +62,18 @@ export function AdminPage() {
         ...form,
         price: Number(form.price) || 0,
         stock: Number(form.stock) || 0,
+        image: form.name?.toLowerCase().split(" ").join("-")
       };
 
       if (payload.id) {
         await productAPI.update(payload.id, payload);
         showToast("Produk berhasil diupdate!");
       } else {
-        await productAPI.create({...payload, id: "p"+products.length+1});
+        await productAPI.create({ ...payload, id: "p-" + parseInt(products.length + 1) });
         showToast("Produk berhasil ditambahkan!");
       }
 
-      console.log("SAVE")
+      loadProducts()
 
       setProductModal(null);
     } catch (err) {
@@ -79,18 +83,20 @@ export function AdminPage() {
   };
 
   const saveCat = async (form) => {
+    const payload = {
+        ...form,
+      };
+
     try {
       if (form.id) {
         await categoryAPI.update(form.id, form);
         showToast("Kategori berhasil diupdate!");
       } else {
-        await categoryAPI.create(form);
+        await categoryAPI.create({ ...payload, id: "cat-" + parseInt(categories.length + 1), update_by: "Yoga" });
         showToast("Kategori berhasil ditambahkan!");
       }
 
-      // Reload data dari database
-      const categories = await categoryAPI.getAll();
-      setCategories(categories);
+      loadCategories();
 
       setCatModal(null);
     } catch (err) {
@@ -172,11 +178,11 @@ export function AdminPage() {
                         <td style={{ padding: '12px 16px' }}>
                           <div style={{ display: 'flex', gap: 6 }}>
                             <Button variant="ghost" size="xs" onClick={() => setProductModal({ ...p })}>✏️</Button>
-                            <Button variant="danger" size="xs" onClick={() => setConfirm({
+                            {/* <Button variant="danger" size="xs" onClick={() => setConfirm({
                               title: 'Hapus Produk',
                               message: `Yakin menghapus "${p.name}"? Tindakan ini tidak bisa dibatalkan.`,
                               onConfirm: () => { dispatch({ type: 'DELETE', payload: p.id }); showToast('Produk dihapus!'); setConfirm(null) },
-                            })}>🗑️</Button>
+                            })}>🗑️</Button> */}
                           </div>
                         </td>
                       </tr>

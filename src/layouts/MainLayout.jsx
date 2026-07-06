@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
-import { useEffect, useReducer, useState } from "react";
+import { useCallback, useEffect, useReducer, useState } from "react";
 
-import { productAPI } from "../api";
+import { productAPI, categoryAPI } from "../api";
 
 import { Navbar } from "../components/domain/Navbar";
 import { useTheme } from "../contexts/ThemeContext";
@@ -19,20 +19,33 @@ export default function MainLayout() {
 
   // const [products, dispatch] = useReducer(productReducer, SEED_PRODUCTS);
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
 
-  useEffect(() => {
-    async function loadProducts() {
+  const loadProducts = useCallback(async () => {
+    try {
       const data = await productAPI.getAll();
       setProducts(data);
+    } catch (err) {
+      console.error(err);
     }
-
-    loadProducts();
   }, []);
 
-  const [categories, catDispatch] = useReducer(
-    categoryReducer,
-    SEED_CATEGORIES
-  );
+  const loadCategories = useCallback(async () => {
+    try {
+      const data = await categoryAPI.getAll();
+      setCategories(data);
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadProducts();
+  }, [loadProducts]);
+
+  useEffect(() => {
+    loadCategories();
+  }, [loadCategories])
 
   return (
     <div
@@ -48,9 +61,10 @@ export default function MainLayout() {
       <Outlet
         context={{
           products,
+          loadProducts,
           categories,
+          loadCategories
           // dispatch,
-          catDispatch,
         }}
       />
 

@@ -17,11 +17,19 @@ export function ProductCard({ product, category }) {
       {/* Thumbnail */}
       <div style={{
         height: 150,
-        background: `linear-gradient(135deg, ${C.bgMuted}, ${C.bgHover})`,
+        background: `#fff`,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         fontSize: 52, position: 'relative',
       }}>
-        {category?.icon ?? '📦'}
+        {product?.image ?
+          <img
+            src={`/image/${product?.image}.png`}
+            height={150}
+          />
+          :
+          category?.icon
+        }
+
         {product.stock === 0 && (
           <div style={{
             position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)',
