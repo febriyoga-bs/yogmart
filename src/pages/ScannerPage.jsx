@@ -108,6 +108,16 @@ export function ScannerPage() {
     }
   }
 
+  const fetchProduct = useCallback(async (barcode) => {
+    doSearch(barcode)
+    // try {
+    //   const data = await productAPI.getProductbyBarcode(barcode);
+    //   setProducts(data);
+    // } catch (err) {
+    //   console.error(err);
+    // }
+  }, []);
+
   const handleManualSubmit = (e) => {
     e.preventDefault()
     if (manualBarcode.trim()) {
