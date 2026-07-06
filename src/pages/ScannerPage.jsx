@@ -155,8 +155,7 @@ export function ScannerPage() {
               <div style={{ textAlign: 'center' }}>
                 <div style={{ width: 68, height: 68, borderRadius: 18, background: C.bgMuted, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: 30 }}>📷</div>
                 <h3 style={{ fontSize: 18, fontWeight: 800, color: C.text, marginBottom: 8 }}>Scan Barcode</h3>
-                <Button onClick={simulateScan} fullWidth size="lg">Simulasi</Button>
-                <Button onClick={startCamera} fullWidth size="lg" icon="📷" style={{ marginTop: 10 }}>Buka Kamera</Button>
+                <Button onClick={startCamera} fullWidth size="lg" style={{ marginTop: 10 }}>Buka Kamera</Button>
               </div>
             </Card>
 
