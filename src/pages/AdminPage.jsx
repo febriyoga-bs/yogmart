@@ -84,8 +84,8 @@ export function AdminPage() {
 
   const saveCat = async (form) => {
     const payload = {
-        ...form,
-      };
+      ...form,
+    };
 
     try {
       if (form.id) {
@@ -146,7 +146,7 @@ export function AdminPage() {
                 <thead style={{ background: C.bgMuted }}>
                   <tr>
                     {['Produk', 'Barcode', 'Kategori', 'Harga', 'Stok', 'Status', ''].map((h, idx) => (
-                      <th key={h} style={{ position: (idx===0)&&"sticky", left: (idx===0)&&0, zIndex: (idx===0)&&3, background: (idx===0)&&C.bgMuted, padding: '12px 16px', textAlign: 'left', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: C.textMuted, whiteSpace: 'nowrap' }}>{h}</th>
+                      <th key={h} style={{ position: (idx === 0) && "sticky", left: (idx === 0) && 0, zIndex: (idx === 0) && 3, background: (idx === 0) && C.bgMuted, padding: '12px 16px', textAlign: 'left', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: C.textMuted, whiteSpace: 'nowrap' }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -159,7 +159,7 @@ export function AdminPage() {
                       <tr key={p.id} style={{ borderTop: `1px solid ${C.border}` }}
                         onMouseEnter={(e) => Array.from(e.currentTarget.cells).forEach((td) => td.style.background = C.bgMuted)}
                         onMouseLeave={(e) => Array.from(e.currentTarget.cells).forEach((td) => td.style.background = C.bg)}>
-                        <td style={{ padding: '12px 16px', position: "sticky", left: 0, zIndex: 3, background: C.bg}}>
+                        <td style={{ maxWidth: "40vw", wordBreak: "break-word", padding: '12px 16px', position: "sticky", left: 0, zIndex: 3, background: C.bg }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                             <div style={{ width: 38, height: 38, borderRadius: 10, background: C.bgMuted, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>
                               {cat?.icon ?? '📦'}

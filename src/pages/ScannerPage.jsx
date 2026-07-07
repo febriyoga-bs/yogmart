@@ -306,7 +306,7 @@ export function ScannerPage() {
                 </div>
               </div>
             </Card>
-            <Button variant="secondary" onClick={reset} fullWidth icon="🔄">Scan Lagi</Button>
+            <Button variant="secondary" onClick={reset} fullWidth >Scan Lagi</Button>
           </div>
         )}
 
