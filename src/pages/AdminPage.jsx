@@ -161,8 +161,12 @@ export function AdminPage() {
                         onMouseLeave={(e) => Array.from(e.currentTarget.cells).forEach((td) => td.style.background = C.bg)}>
                         <td style={{ maxWidth: "40vw", wordBreak: "break-word", padding: '12px 16px', position: "sticky", left: 0, zIndex: 3, background: C.bg }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                            <div style={{ width: 38, height: 38, borderRadius: 10, background: C.bgMuted, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>
-                              {cat?.icon ?? '📦'}
+                            <div style={{ width: 38, height: 38, borderRadius: 10, background: C.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>
+                              <img
+                                src={`/image/${p?.image}.png`}
+                                width={30}
+                                height={30}
+                              />
                             </div>
                             <div>
                               <div style={{ fontWeight: 700, fontSize: 14, color: C.text }}>{p.name}</div>
@@ -170,10 +174,10 @@ export function AdminPage() {
                             </div>
                           </div>
                         </td>
-                        <td style={{ padding: '12px 16px' }}><span style={{ fontFamily: 'monospace', fontSize: 13, color: C.textMuted }}>{p.barcode}</span></td>
-                        <td style={{ padding: '12px 16px' }}><span style={{ fontSize: 13, color: C.text }}>{cat?.icon} {cat?.name ?? '-'}</span></td>
-                        <td style={{ padding: '12px 16px' }}><span style={{ fontWeight: 800, color: C.primary }}>{formatPrice(p.price)}</span></td>
-                        <td style={{ padding: '12px 16px' }}><span style={{ fontWeight: 700, color: C.text }}>{p.stock} {p.unit}</span></td>
+                        <td style={{ padding: '12px 16px' }}><span style={{ background: C.bg, fontFamily: 'monospace', fontSize: 13, color: C.textMuted }}>{p.barcode}</span></td>
+                        <td style={{ padding: '12px 16px' }}><span style={{ background: C.bg, fontSize: 13, color: C.text }}>{cat?.icon} {cat?.name ?? '-'}</span></td>
+                        <td style={{ padding: '12px 16px' }}><span style={{ background: C.bg, fontWeight: 800, color: C.primary }}>{formatPrice(p.price)}</span></td>
+                        <td style={{ padding: '12px 16px' }}><span style={{ background: C.bg, fontWeight: 700, color: C.text }}>{p.stock} {p.unit}</span></td>
                         <td style={{ padding: '12px 16px' }}><StockBadge stock={p.stock} /></td>
                         <td style={{ padding: '12px 16px' }}>
                           <div style={{ display: 'flex', gap: 6 }}>
