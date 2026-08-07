@@ -12,18 +12,63 @@ import { UNIT_OPTIONS } from '../../utils/constants'
  * @param {Function} onSave - (formData) => void
  * @param {Function} onClose
  */
+
 export function ProductFormModal({ initial, categories, onSave, onClose }) {
   const [form, setForm] = useState({ ...initial })
   const [errors, setErrors] = useState({})
+  const [imageFile, setImageFile] = useState(null)
+  const [imagePreview, setImagePreview] = useState(initial.image_url || null)
 
   const set = (key, value) => setForm((prev) => ({ ...prev, [key]: value }))
+
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // basic validation
+    const maxSizeMB = 2
+    if (!file.type.startsWith('image/')) {
+      setErrors((prev) => ({ ...prev, image: 'File harus berupa gambar' }))
+      return
+    }
+    if (file.size > maxSizeMB * 1024 * 1024) {
+      setErrors((prev) => ({ ...prev, image: `Ukuran gambar maksimal ${maxSizeMB}MB` }))
+      return
+    }
+
+    setErrors((prev) => ({ ...prev, image: undefined }))
+    setImageFile(file)
+    setImagePreview(URL.createObjectURL(file))
+  }
+
+  const handleRemoveImage = () => {
+    setImageFile(null)
+    setImagePreview(null)
+    set('image_url', null) // signal removal to backend on edit
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault()
     const errs = validateProduct(form)
-    setErrors(errs)
+    setErrors((prev) => ({ ...prev, ...errs }))
     if (!isFormValid(errs)) return
-    onSave(form)
+
+    // Build multipart payload since an image file may be attached
+    const formData = new FormData()
+    Object.entries(form).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        formData.append(key, value)
+      }
+    })
+    if (imageFile) {
+      formData.append('image', imageFile)
+    } else if (form.image_url === null) {
+      // explicit removal flag for edit mode
+      formData.append('remove_image', 'true')
+    }
+
+    console.log(formData)
+    onSave(formData)
   }
 
   return (
@@ -36,6 +81,44 @@ export function ProductFormModal({ initial, categories, onSave, onClose }) {
           placeholder="Nama produk"
           error={errors.name}
         />
+
+        {/* Image upload */}
+        <div>
+          <label style={{ fontSize: 13, fontWeight: 500, marginBottom: 6, display: 'block' }}>
+            Gambar Produk
+          </label>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div
+              style={{
+                width: 72,
+                height: 72,
+                borderRadius: 8,
+                border: '1px dashed #ccc',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden',
+                background: '#fafafa',
+                flexShrink: 0,
+              }}
+            >
+              {imagePreview ? (
+                <img src={imagePreview} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <span style={{ fontSize: 24 }}>img</span>
+              )}
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <input type="file" accept="image/*" onChange={handleImageChange} />
+              {imagePreview && (
+                <Button type="button" variant="secondary" onClick={handleRemoveImage}>
+                  Hapus Gambar
+                </Button>
+              )}
+            </div>
+          </div>
+          {errors.image && <div style={{ color: 'red', fontSize: 12, marginTop: 4 }}>{errors.image}</div>}
+        </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <Input

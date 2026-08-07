@@ -3,6 +3,7 @@ import axios from "axios";
 // Base Client
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "https://yogmart-be.onrender.com/api",
+  // baseURL: import.meta.env.VITE_API_URL || "http://localhost:8080/api",
   timeout: 30000,
 });
 
@@ -20,9 +21,13 @@ export const productAPI = {
 
   getByBarcode: (barcode) => api.get(`/products/barcode/${barcode}`),
 
-  create: (data) => api.post("/products", data),
+  create: (data) => api.post("/products", data, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
 
-  update: (id, data) => api.put(`/products/${id}`, data),
+  update: (id, data) => api.put(`/products/${id}`, data, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
 
   delete: (id) => api.delete(`/products/${id}`),
 

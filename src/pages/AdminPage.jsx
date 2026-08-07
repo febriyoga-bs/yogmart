@@ -56,25 +56,23 @@ export function AdminPage() {
     low: products.filter((p) => p.stock < 10).length,
   }
 
-  const saveProduct = async (form) => {
+  const saveProduct = async (formData) => {
     try {
-      const payload = {
-        ...form,
-        price: Number(form.price) || 0,
-        stock: Number(form.stock) || 0,
-        image: form.name?.toLowerCase().split(" ").join("-")
-      };
+      // formData is already a FormData instance from ProductFormModal,
+      // containing text fields + the image file (if any)
+      const id = formData.get('id')
 
-      if (payload.id) {
-        await productAPI.update(payload.id, payload);
+      if (id) {
+        await productAPI.update(id, formData);
         showToast("Produk berhasil diupdate!");
       } else {
-        await productAPI.create({ ...payload, id: "p-" + parseInt(products.length + 1) });
+        const newId = "p-" + (products.length + 1);
+        formData.set('id', newId); // ensure id is included for create
+        await productAPI.create(formData);
         showToast("Produk berhasil ditambahkan!");
       }
 
-      loadProducts()
-
+      loadProducts();
       setProductModal(null);
     } catch (err) {
       console.error(err);
