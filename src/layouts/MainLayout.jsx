@@ -50,7 +50,6 @@ export default function MainLayout() {
   return (
     <div
       style={{
-        fontFamily: "'Plus Jakarta Sans', sans-serif",
         background: C.bg,
         minHeight: "100vh",
         color: C.text,
@@ -58,18 +57,23 @@ export default function MainLayout() {
     >
       <Navbar />
 
-      <Outlet
-        context={{
-          products,
-          loadProducts,
-          categories,
-          loadCategories
-          // dispatch,
-        }}
-      />
+      <main className="tk-main">
+        <Outlet
+          context={{
+            products,
+            loadProducts,
+            categories,
+            loadCategories
+            // dispatch,
+          }}
+        />
+      </main>
 
       <footer
+        className="tk-hide-mobile"
         style={{
+          color: C.textMuted,
+          fontSize: 13,
           marginTop: 48,
           padding: 24,
           borderTop: `1px solid ${C.border}`,

@@ -30,7 +30,8 @@ function ToastItem({ toast, onDismiss }) {
       boxShadow:     C.shadowLg,
       animation:     'tk-slideUp 0.3s ease',
       minWidth:      260,
-      maxWidth:      360,
+      maxWidth:      '100%',
+      width:         360,
     }}>
       <span style={{ fontSize: 18 }}>{icons[toast.type] ?? '💬'}</span>
       <span style={{ fontSize: 14, fontWeight: 600, color: C.text, flex: 1 }}>
@@ -67,9 +68,8 @@ export function ToastProvider({ children }) {
       {children}
       {/* Container */}
       {toasts.length > 0 && (
-        <div style={{
-          position: 'fixed', bottom: 24, right: 24,
-          zIndex: 9999, display: 'flex', flexDirection: 'column', gap: 8,
+        <div className="tk-toasts" style={{
+          position: 'fixed', zIndex: 9999, display: 'flex', flexDirection: 'column', gap: 8,
         }}>
           {toasts.map((t) => (
             <ToastItem key={t.id} toast={t} onDismiss={dismiss} />

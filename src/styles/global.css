@@ -1,0 +1,107 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+/* Warna tema di-set sebagai CSS variable oleh ThemeContext (--c-primary, --c-bg, dst) */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  background: var(--c-bg);
+  color: var(--c-text);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button, input, select, textarea { font-family: inherit; }
+img { display: block; }
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #88888840; border-radius: 99px; }
+input::placeholder, textarea::placeholder { color: var(--c-textLight); }
+input[type=number]::-webkit-inner-spin-button { opacity: .4; }
+
+/* Input di iOS di-zoom otomatis kalau font < 16px */
+@media (max-width: 767px) {
+  input, select, textarea { font-size: 16px !important; }
+}
+
+@keyframes tk-fadeIn  { from { opacity: 0; transform: translateY(8px);  } to { opacity: 1; transform: translateY(0);  } }
+@keyframes tk-slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes tk-sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes tk-spin    { to   { transform: rotate(360deg); } }
+@keyframes tk-shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+@keyframes tk-scanLine { 0%, 100% { top: 6%; } 50% { top: 92%; } }
+@keyframes tk-pulse   { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
+
+/* ─── Layout ─────────────────────────────────────────────────────────────── */
+
+.tk-container {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+.tk-hide-scrollbar { scrollbar-width: none; }
+.tk-hide-scrollbar::-webkit-scrollbar { display: none; }
+
+/* Ruang untuk bottom nav di mobile */
+.tk-main { min-height: calc(100vh - 64px); }
+
+/* ─── Product grid ───────────────────────────────────────────────────────── */
+
+.tk-product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 18px;
+}
+
+.tk-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.tk-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* ─── Toast ─────────────────────────────────────────────────────────────── */
+
+.tk-toasts { right: 24px; bottom: 24px; }
+
+/* ─── Mobile ─────────────────────────────────────────────────────────────── */
+
+@media (max-width: 1023px) {
+  .tk-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+}
+
+@media (max-width: 767px) {
+  .tk-container { padding-left: 16px; padding-right: 16px; }
+
+  .tk-main { min-height: calc(100vh - 56px); padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
+
+  .tk-product-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .tk-product-card__desc,
+  .tk-product-card__barcode { display: none !important; }
+
+  .tk-hide-mobile { display: none !important; }
+
+  /* toast di atas bottom nav, selebar layar */
+  .tk-toasts { left: 16px; right: 16px; bottom: calc(84px + env(safe-area-inset-bottom)); align-items: stretch; }
+  .tk-toasts > * { width: 100% !important; min-width: 0 !important; }
+}
+
+@media (max-width: 380px) {
+  .tk-form-grid { grid-template-columns: 1fr; }
+}
+
+@media (min-width: 768px) {
+  .tk-show-mobile { display: none !important; }
+}

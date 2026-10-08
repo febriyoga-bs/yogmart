@@ -3,6 +3,7 @@ import { Card } from '../ui/Card'
 import { StockBadge } from './StockBadge'
 import { formatPrice } from '../../utils/formatters'
 import { getProductImage } from '../../utils/productImage'
+import { STOCK_THRESHOLD_LOW } from '../../utils/constants'
 
 /**
  * Kartu produk untuk katalog publik
@@ -12,52 +13,50 @@ import { getProductImage } from '../../utils/productImage'
 export function ProductCard({ product, category }) {
   const { theme } = useTheme()
   const C = theme.colors
+  const image = getProductImage(product)
 
   return (
-    <Card hoverable padding="none" style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+    <Card hoverable padding="none" style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column', height: '100%', borderRadius: 18 }}>
       {/* Thumbnail */}
       <div style={{
-        height: 150,
-        background: `#fff`,
+        aspectRatio: '4 / 3',
+        background: '#fff',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 52, position: 'relative',
+        fontSize: 44, position: 'relative', flexShrink: 0,
       }}>
-        {getProductImage(product) ?
-          <img
-            src={getProductImage(product)}
-            alt={product.name}
-            style={{ height: 150, maxWidth: '100%', objectFit: 'contain' }}
-          />
-          :
-          category?.icon
-        }
+        {image
+          ? <img src={image} alt={product.name} loading="lazy" style={{ position: 'absolute', inset: 10, width: 'calc(100% - 20px)', height: 'calc(100% - 20px)', objectFit: 'contain' }} />
+          : category?.icon ?? '📦'}
+
+        {/* Badge stok di pojok — hanya kalau menipis / habis */}
+        {product.stock < STOCK_THRESHOLD_LOW && (
+          <div style={{ position: 'absolute', top: 8, right: 8 }}>
+            <StockBadge stock={product.stock} />
+          </div>
+        )}
 
         {product.stock === 0 && (
-          <div style={{
-            position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <span style={{ color: 'white', fontWeight: 800, fontSize: 18, letterSpacing: '0.05em' }}>
-              HABIS
-            </span>
-          </div>
+          <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.55)' }} />
         )}
       </div>
 
       {/* Body */}
-      <div style={{ padding: '14px 16px', flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <div style={{ padding: '12px 14px 14px', flex: 1, display: 'flex', flexDirection: 'column', gap: 4, borderTop: `1px solid ${C.border}` }}>
         {category && (
-          <div style={{ fontSize: 11, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+          <div style={{ fontSize: 11, color: C.textMuted, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {category.icon} {category.name}
           </div>
         )}
 
-        <div style={{ fontSize: 15, fontWeight: 800, lineHeight: 1.3, color: C.text }}>
+        <div style={{
+          fontSize: 14, fontWeight: 700, lineHeight: 1.35, color: C.text,
+          display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+        }}>
           {product.name}
         </div>
 
         {product.description && (
-          <div style={{
+          <div className="tk-product-card__desc" style={{
             fontSize: 12, color: C.textMuted, lineHeight: 1.5, overflow: 'hidden',
             display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
           }}>
@@ -65,20 +64,14 @@ export function ProductCard({ product, category }) {
           </div>
         )}
 
-        <div style={{ marginTop: 'auto', paddingTop: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-          <div>
-            <div style={{ fontSize: 17, fontWeight: 800, color: C.primary }}>{formatPrice(product.price)}</div>
-            <div style={{ fontSize: 12, color: C.textMuted }}>/{product.unit}</div>
-          </div>
-          <StockBadge stock={product.stock} />
+        <div style={{ marginTop: 'auto', paddingTop: 8, display: 'flex', alignItems: 'baseline', gap: 4, flexWrap: 'wrap' }}>
+          <span style={{ fontSize: 16, fontWeight: 800, color: C.primary }}>{formatPrice(product.price)}</span>
+          <span style={{ fontSize: 12, color: C.textMuted }}>/{product.unit}</span>
         </div>
-      </div>
 
-      {/* Barcode footer */}
-      <div style={{ padding: '8px 16px', borderTop: `1px solid ${C.border}`, background: C.bgMuted }}>
-        <span style={{ fontSize: 12, color: C.textLight, fontFamily: 'monospace' }}>
-          🏷 {product.barcode}
-        </span>
+        <div className="tk-product-card__barcode" style={{ fontSize: 11, color: C.textLight, fontFamily: 'monospace' }}>
+          {product.barcode}
+        </div>
       </div>
     </Card>
   )

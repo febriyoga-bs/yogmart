@@ -1,9 +1,10 @@
 import { useTheme } from '../contexts/ThemeContext'
 import { useProductFilter } from '../hooks/useProductFilter'
-import { SearchBar, FilterPill, EmptyState } from '../components/ui'
+import { SearchBar, FilterPill, EmptyState, PageHero, Skeleton } from '../components/ui'
 import { ProductCard } from '../components/domain'
 import { useState } from 'react'
 import { useOutletContext } from "react-router-dom";
+import { APP_NAME } from '../utils/constants'
 
 /**
  * Halaman katalog publik — tampil grid produk, filter kategori & search
@@ -20,33 +21,26 @@ export function CatalogPage() {
   } = useOutletContext();
   const { filtered, total, isEmpty } = useProductFilter(products, { search, categoryId })
   const getCat = (id) => categories.find((c) => c.id === id)
+  const loading = products.length === 0 && !search && !categoryId
 
   return (
     <div>
-      {/* Hero */}
-      <div style={{ background: C.heroGrad, padding: '48px 24px 56px', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', top: -80, right: -80, width: 320, height: 320, background: 'rgba(255,255,255,0.03)', borderRadius: '50%' }} />
-        <div style={{ position: 'absolute', bottom: -50, left: '25%', width: 240, height: 240, background: `${C.accent}18`, borderRadius: '50%' }} />
-
-        <div style={{ maxWidth: 1100, margin: '0 auto', position: 'relative' }}>
-          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
-            🛒 Warung Yoga
-          </div>
-          <h1 style={{ fontSize: 'clamp(30px,4vw,48px)', color: 'white', fontWeight: 400, fontFamily: 'Georgia,serif', lineHeight: 1.1, marginBottom: 12 }}>
-            Katalog <em>Belanja</em>
-          </h1>
-          <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: 15, marginBottom: 28 }}>
-            Temukan semua kebutuhan sehari-hari dengan harga terbaik
-          </p>
-          <div style={{ maxWidth: 500 }}>
-            <SearchBar value={search} onChange={setSearch} placeholder="Cari produk atau barcode..." />
-          </div>
+      <PageHero
+        eyebrow={`🛒 ${APP_NAME}`}
+        title="Katalog Belanja"
+        subtitle="Temukan semua kebutuhan sehari-hari dengan harga terbaik"
+      >
+        <div style={{ maxWidth: 520 }}>
+          <SearchBar value={search} onChange={setSearch} placeholder="Cari produk atau barcode..." />
         </div>
-      </div>
+      </PageHero>
 
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '28px 24px' }}>
-        {/* Category pills */}
-        <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 8, marginBottom: 22 }}>
+      {/* Filter kategori — menempel di bawah header saat scroll */}
+      <div style={{
+        position: 'sticky', top: 'calc(60px + env(safe-area-inset-top))', zIndex: 20,
+        background: `${C.bg}f0`, backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
+      }}>
+        <div className="tk-container tk-hide-scrollbar" style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingTop: 12, paddingBottom: 12 }}>
           <FilterPill label="Semua" icon="✨" active={!categoryId} onClick={() => setCategoryId('')} />
           {categories.map((c) => (
             <FilterPill
@@ -58,22 +52,29 @@ export function CatalogPage() {
             />
           ))}
         </div>
+      </div>
 
-        <div style={{ fontSize: 13, color: C.textMuted, marginBottom: 18 }}>
+      <div className="tk-container" style={{ paddingTop: 8, paddingBottom: 28 }}>
+        <div style={{ fontSize: 13, color: C.textMuted, marginBottom: 14 }}>
           Menampilkan <strong style={{ color: C.text }}>{filtered.length}</strong> dari {total} produk
         </div>
 
-        {/* Grid */}
-        {isEmpty ? (
+        {loading ? (
+          <div className="tk-product-grid">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <Skeleton key={i} height={240} radius={18} />
+            ))}
+          </div>
+        ) : isEmpty ? (
           <EmptyState
             icon="🔍"
             title="Produk tidak ditemukan"
             description="Coba ubah kata kunci atau pilih kategori lain"
           />
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(210px,1fr))', gap: 18 }}>
+          <div className="tk-product-grid">
             {filtered.map((p, i) => (
-              <div key={p.id} style={{ animation: `tk-fadeIn 0.4s ${i * 0.04}s both` }}>
+              <div key={p.id} style={{ animation: `tk-fadeIn 0.4s ${Math.min(i, 12) * 0.03}s both` }}>
                 <ProductCard product={p} category={getCat(p.category_id)} />
               </div>
             ))}

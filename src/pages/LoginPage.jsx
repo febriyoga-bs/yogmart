@@ -51,7 +51,7 @@ export function LoginPage() {
       <Card padding="xl" style={{ width: '100%', maxWidth: 400, animation: 'tk-slideUp 0.3s ease' }}>
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
           <div style={{ fontSize: 12, color: C.textMuted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Admin Panel</div>
-          <h1 style={{ fontSize: 28, color: C.text, fontWeight: 400, fontFamily: 'Georgia,serif' }}>Masuk <em>Warung</em></h1>
+          <h1 style={{ fontSize: 26, color: C.text, fontWeight: 800, letterSpacing: '-0.02em' }}>Masuk Dashboard</h1>
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>

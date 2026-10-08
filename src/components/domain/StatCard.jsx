@@ -24,18 +24,18 @@ export function StatCard({ label, value, icon, variant = 'neutral' }) {
   const v = variants[variant] ?? variants.neutral
 
   return (
-    <Card>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-        <span style={{ fontSize: 13, color: C.textMuted, fontWeight: 600 }}>{label}</span>
+    <Card padding="sm" style={{ borderRadius: 16, padding: 'clamp(12px, 3vw, 18px)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 10 }}>
+        <span style={{ fontSize: 12, color: C.textMuted, fontWeight: 700 }}>{label}</span>
         <div style={{
-          width: 40, height: 40, borderRadius: 10,
+          width: 34, height: 34, borderRadius: 10, flexShrink: 0,
           background: v.bg, color: v.color,
-          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17,
         }}>
           {icon}
         </div>
       </div>
-      <div style={{ fontSize: 26, fontWeight: 800, color: C.text }}>{value}</div>
+      <div style={{ fontSize: 'clamp(17px, 4.6vw, 24px)', fontWeight: 800, color: C.text, letterSpacing: '-0.02em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{value}</div>
     </Card>
   )
 }

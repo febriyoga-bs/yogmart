@@ -146,6 +146,10 @@ export const UNIT_OPTIONS = [
   'lusin', 'pak', 'pcs',
 ]
 
+// ─── Form Defaults ──────────────────────────────────────────────────────────────
+
+export const EMPTY_PRODUCT = { name: '', barcode: '', price: '', stock: '', unit: 'buah', category_id: '', description: '' }
+
 // ─── Nav Items ────────────────────────────────────────────────────────────────
 
 export const NAV_ITEMS = [

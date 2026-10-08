@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Search, X } from 'lucide-react'
 import { useTheme } from '../../contexts/ThemeContext'
 
 /**
@@ -14,10 +15,10 @@ export function SearchBar({ value, onChange, placeholder = 'Cari...' }) {
 
   return (
     <div style={{ position: 'relative' }}>
-      <span style={{
-        position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)',
-        fontSize: 16, color: C.textMuted, pointerEvents: 'none',
-      }}>🔍</span>
+      <Search size={18} style={{
+        position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)',
+        color: C.textMuted, pointerEvents: 'none',
+      }} />
 
       <input
         value={value}
@@ -26,8 +27,8 @@ export function SearchBar({ value, onChange, placeholder = 'Cari...' }) {
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         style={{
-          width: '100%', padding: '10px 40px 10px 40px',
-          borderRadius: 10, fontSize: 14, fontFamily: 'inherit',
+          width: '100%', height: 46, padding: '0 42px 0 42px',
+          borderRadius: 14, fontSize: 15, fontFamily: 'inherit',
           background: C.bgCard, color: C.text,
           border: `1.5px solid ${focused ? C.primary : C.border}`,
           outline: 'none', transition: 'border-color 0.2s',
@@ -38,12 +39,14 @@ export function SearchBar({ value, onChange, placeholder = 'Cari...' }) {
       {value && (
         <button
           onClick={() => onChange('')}
+          aria-label="Hapus pencarian"
           style={{
-            position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)',
-            border: 'none', background: 'none', cursor: 'pointer',
-            color: C.textMuted, fontSize: 18, lineHeight: 1, padding: 2,
+            position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)',
+            width: 30, height: 30, borderRadius: '50%',
+            border: 'none', background: C.bgMuted, cursor: 'pointer',
+            color: C.textMuted, display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
-          ×
+          <X size={16} />
         </button>
       )}
     </div>
