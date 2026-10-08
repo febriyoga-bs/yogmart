@@ -4,6 +4,10 @@ import { Input, Select, Textarea } from '../ui/Input'
 import { Button } from '../ui/Button'
 import { validateProduct, isFormValid } from '../../utils/validators'
 import { UNIT_OPTIONS } from '../../utils/constants'
+import { getProductImage } from '../../utils/productImage'
+
+// Field yang dikirim ke backend (sisanya — image_url, updated_at, category_name, dst — hanya untuk tampilan)
+const PAYLOAD_FIELDS = ['id', 'name', 'barcode', 'price', 'stock', 'unit', 'category_id', 'description']
 
 /**
  * Modal form tambah / edit produk
@@ -17,7 +21,8 @@ export function ProductFormModal({ initial, categories, onSave, onClose }) {
   const [form, setForm] = useState({ ...initial })
   const [errors, setErrors] = useState({})
   const [imageFile, setImageFile] = useState(null)
-  const [imagePreview, setImagePreview] = useState(initial.image_url || null)
+  const [removeImage, setRemoveImage] = useState(false)
+  const [imagePreview, setImagePreview] = useState(getProductImage(initial))
 
   const set = (key, value) => setForm((prev) => ({ ...prev, [key]: value }))
 
@@ -38,13 +43,14 @@ export function ProductFormModal({ initial, categories, onSave, onClose }) {
 
     setErrors((prev) => ({ ...prev, image: undefined }))
     setImageFile(file)
+    setRemoveImage(false)
     setImagePreview(URL.createObjectURL(file))
   }
 
   const handleRemoveImage = () => {
     setImageFile(null)
     setImagePreview(null)
-    set('image_url', null) // signal removal to backend on edit
+    setRemoveImage(true) // signal removal to backend on edit
   }
 
   const handleSubmit = (e) => {
@@ -55,19 +61,19 @@ export function ProductFormModal({ initial, categories, onSave, onClose }) {
 
     // Build multipart payload since an image file may be attached
     const formData = new FormData()
-    Object.entries(form).forEach(([key, value]) => {
+    PAYLOAD_FIELDS.forEach((key) => {
+      const value = form[key]
       if (value !== undefined && value !== null) {
         formData.append(key, value)
       }
     })
     if (imageFile) {
       formData.append('image', imageFile)
-    } else if (form.image_url === null) {
+    } else if (removeImage) {
       // explicit removal flag for edit mode
       formData.append('remove_image', 'true')
     }
 
-    console.log(formData)
     onSave(formData)
   }
 

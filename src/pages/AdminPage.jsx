@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { useTheme } from '../contexts/ThemeContext'
 import { useToast } from '../contexts/ToastContext'
 import { useProductFilter } from '../hooks/useProductFilter'
-import { formatPrice, formatDateTime } from '../utils/formatters'
+import { formatPrice, formatDateTime, generateId } from '../utils/formatters'
+import { getProductImage } from '../utils/productImage'
 import {
   Card, Tabs, SearchBar, Select, Button, EmptyState, ConfirmDialog
 } from '../components/ui'
@@ -67,7 +68,8 @@ export function AdminPage() {
         await productAPI.update(id, formData);
         showToast("Produk berhasil diupdate!");
       } else {
-        const newId = "p-" + (products.length + 1);
+        // ID unik — "p-" + jumlah produk bisa bentrok kalau ada produk yang pernah dihapus
+        const newId = generateId("p");
         formData.set('id', newId); // ensure id is included for create
         await productAPI.create(formData);
         showToast("Produk berhasil ditambahkan!");
@@ -161,11 +163,13 @@ export function AdminPage() {
                         <td style={{ maxWidth: "40vw", wordBreak: "break-word", padding: '12px 16px', position: "sticky", left: 0, zIndex: 3, background: C.bg }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                             <div style={{ width: 38, height: 38, borderRadius: 10, background: C.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>
-                              <img
-                                src={`/image/${p?.image}.png`}
-                                width={30}
-                                height={30}
-                              />
+                              {getProductImage(p) ? (
+                                <img
+                                  src={getProductImage(p)}
+                                  alt={p.name}
+                                  style={{ width: 30, height: 30, objectFit: 'contain' }}
+                                />
+                              ) : getCat(p.category_id)?.icon}
                             </div>
                             <div>
                               <div style={{ fontWeight: 700, fontSize: 14, color: C.text }}>{p.name}</div>

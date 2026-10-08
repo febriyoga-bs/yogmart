@@ -1,8 +1,10 @@
 import axios from "axios";
 
+export const API_BASE_URL = import.meta.env.VITE_API_URL || "https://yogmart-be.onrender.com/api";
+
 // Base Client
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "https://yogmart-be.onrender.com/api",
+  baseURL: API_BASE_URL,
   // baseURL: import.meta.env.VITE_API_URL || "http://localhost:8080/api",
   timeout: 30000,
 });

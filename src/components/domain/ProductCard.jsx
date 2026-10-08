@@ -2,6 +2,7 @@ import { useTheme } from '../../contexts/ThemeContext'
 import { Card } from '../ui/Card'
 import { StockBadge } from './StockBadge'
 import { formatPrice } from '../../utils/formatters'
+import { getProductImage } from '../../utils/productImage'
 
 /**
  * Kartu produk untuk katalog publik
@@ -21,10 +22,11 @@ export function ProductCard({ product, category }) {
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         fontSize: 52, position: 'relative',
       }}>
-        {product?.image ?
+        {getProductImage(product) ?
           <img
-            src={`/image/${product?.image}.png`}
-            height={150}
+            src={getProductImage(product)}
+            alt={product.name}
+            style={{ height: 150, maxWidth: '100%', objectFit: 'contain' }}
           />
           :
           category?.icon

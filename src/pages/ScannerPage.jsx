@@ -7,6 +7,7 @@ import { StockBadge } from '../components/domain'
 import { formatPrice } from '../utils/formatters'
 import { SEED_CATEGORIES } from '../utils/constants'
 import { useOutletContext } from "react-router-dom";
+import { getProductImage } from '../utils/productImage'
 
 /**
  * Halaman cek harga via scan barcode / input manual
@@ -265,10 +266,11 @@ export function ScannerPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14, animation: 'tk-fadeIn 0.4s ease' }}>
             <Card padding="none" style={{ overflow: 'hidden' }}>
               <div style={{ height: 150, background: C.heroGrad, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 56 }}>
-                {result?.image ?
+                {getProductImage(result) ?
                   <img
-                    src={`/image/${result?.image}.png`}
-                    height={150}
+                    src={getProductImage(result)}
+                    alt={result.name}
+                    style={{ height: 150, maxWidth: '100%', objectFit: 'contain' }}
                   />
                   :
                   getCatIcon(result.category_id)
