@@ -11,8 +11,9 @@ import { useIsMobile } from '../../hooks/useMediaQuery'
  * @param {Function} onClose
  * @param {number} width - max-width dalam px (default: 520)
  * @param {ReactNode} footer - slot untuk tombol aksi bawah
+ * @param {ReactNode} actions - tombol tambahan di header, sebelah tombol tutup
  */
-export function Modal({ title, onClose, children, width = 520, footer }) {
+export function Modal({ title, onClose, children, width = 520, footer, actions }) {
   const { theme } = useTheme()
   const C = theme.colors
   const isMobile = useIsMobile()
@@ -58,7 +59,8 @@ export function Modal({ title, onClose, children, width = 520, footer }) {
 
         {/* Header */}
         <div style={{ padding: isMobile ? '12px 18px 0' : '22px 24px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-          <h2 style={{ fontSize: isMobile ? 18 : 20, fontWeight: 800, color: C.text, minWidth: 0 }}>{title}</h2>
+          <h2 style={{ fontSize: isMobile ? 18 : 20, fontWeight: 800, color: C.text, minWidth: 0, marginRight: 'auto' }}>{title}</h2>
+          {actions}
           <button onClick={onClose} aria-label="Tutup" style={{
             width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
             border: `1px solid ${C.border}`, background: C.bgMuted,

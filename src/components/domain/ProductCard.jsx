@@ -4,7 +4,6 @@ import { StockBadge } from './StockBadge'
 import { formatPrice } from '../../utils/formatters'
 import { getProductImage } from '../../utils/productImage'
 import { STOCK_THRESHOLD_LOW } from '../../utils/constants'
-import { compareWithAlfagift } from '../../utils/alfagift'
 
 /**
  * Kartu produk untuk katalog publik
@@ -16,7 +15,6 @@ export function ProductCard({ product, category, onClick }) {
   const { theme } = useTheme()
   const C = theme.colors
   const image = getProductImage(product)
-  const cmp = compareWithAlfagift(product.price, product.alfagift_price)
 
   return (
     <Card hoverable padding="none" onClick={onClick} style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column', height: '100%', borderRadius: 18 }}>
@@ -71,12 +69,6 @@ export function ProductCard({ product, category, onClick }) {
           <span style={{ fontSize: 16, fontWeight: 800, color: C.primary }}>{formatPrice(product.price)}</span>
           <span style={{ fontSize: 12, color: C.textMuted }}>/{product.unit}</span>
         </div>
-
-        {cmp?.status === 'cheaper' && (
-          <div style={{ alignSelf: 'flex-start', fontSize: 11, fontWeight: 800, color: C.success, background: C.successBg, padding: '2px 8px', borderRadius: 99 }}>
-            Hemat {formatPrice(cmp.diff)} vs Alfagift
-          </div>
-        )}
 
         <div className="tk-product-card__barcode" style={{ fontSize: 11, color: C.textLight, fontFamily: 'monospace' }}>
           {product.barcode}

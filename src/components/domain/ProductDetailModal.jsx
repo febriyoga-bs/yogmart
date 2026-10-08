@@ -1,3 +1,4 @@
+import { Pencil } from 'lucide-react'
 import { useTheme } from '../../contexts/ThemeContext'
 import { formatPrice } from '../../utils/formatters'
 import { getProductImage } from '../../utils/productImage'
@@ -10,14 +11,27 @@ import { AlfagiftCompare } from './AlfagiftCompare'
  * @param {object} product
  * @param {{ icon, name }} category
  * @param {Function} onClose
+ * @param {Function} onEdit - kalau diisi (admin login), tampil tombol edit di header
  */
-export function ProductDetailModal({ product, category, onClose }) {
+export function ProductDetailModal({ product, category, onClose, onEdit }) {
   const { theme } = useTheme()
   const C = theme.colors
   const image = getProductImage(product)
 
   return (
-    <Modal title={product.name} onClose={onClose} width={460}>
+    <Modal
+      title={product.name}
+      onClose={onClose}
+      width={460}
+      actions={onEdit && (
+        <button onClick={onEdit} aria-label="Edit produk" title="Edit produk" style={{
+          width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
+          border: `1px solid ${C.border}`, background: C.primaryAlpha, color: C.primary,
+          cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <Pencil size={16} />
+        </button>
+      )}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
         <div style={{ aspectRatio: '16 / 10', background: '#fff', borderRadius: 16, border: `1px solid ${C.border}`, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 64 }}>
           {image

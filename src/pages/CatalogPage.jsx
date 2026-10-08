@@ -1,7 +1,9 @@
 import { useTheme } from '../contexts/ThemeContext'
 import { useProductFilter } from '../hooks/useProductFilter'
 import { SearchBar, FilterPill, EmptyState, PageHero, Skeleton } from '../components/ui'
-import { ProductCard, ProductDetailModal } from '../components/domain'
+import { ProductCard, ProductDetailModal, ProductFormModal } from '../components/domain'
+import { useAuth } from '../contexts/AuthContext'
+import { useSaveProduct } from '../hooks/useSaveProduct'
 import { useState } from 'react'
 import { useOutletContext } from "react-router-dom";
 import { APP_NAME } from '../utils/constants'
@@ -14,7 +16,10 @@ export function CatalogPage() {
   const C = theme.colors
   const [search, setSearch] = useState('')
   const [categoryId, setCategoryId] = useState('')
-  const [detail, setDetail] = useState(null)
+  const [detailId, setDetailId] = useState(null)
+  const [editing, setEditing] = useState(null)
+  const { user } = useAuth()
+  const saveProduct = useSaveProduct()
 
   const {
     products,
@@ -22,6 +27,12 @@ export function CatalogPage() {
   } = useOutletContext();
   const { filtered, total, isEmpty } = useProductFilter(products, { search, categoryId })
   const getCat = (id) => categories.find((c) => c.id === id)
+  // Ambil dari daftar terbaru supaya detail ikut ter-update setelah diedit
+  const detail = products.find((p) => p.id === detailId)
+
+  const handleSave = async (formData) => {
+    if (await saveProduct(formData)) setEditing(null)
+  }
   const loading = products.length === 0 && !search && !categoryId
 
   return (
@@ -76,15 +87,23 @@ export function CatalogPage() {
           <div className="tk-product-grid">
             {filtered.map((p, i) => (
               <div key={p.id} style={{ animation: `tk-fadeIn 0.4s ${Math.min(i, 12) * 0.03}s both` }}>
-                <ProductCard product={p} category={getCat(p.category_id)} onClick={() => setDetail(p)} />
+                <ProductCard product={p} category={getCat(p.category_id)} onClick={() => setDetailId(p.id)} />
               </div>
             ))}
           </div>
         )}
       </div>
 
-      {detail && (
-        <ProductDetailModal product={detail} category={getCat(detail.category_id)} onClose={() => setDetail(null)} />
+      {detail && !editing && (
+        <ProductDetailModal
+          product={detail}
+          category={getCat(detail.category_id)}
+          onClose={() => setDetailId(null)}
+          onEdit={user ? () => setEditing({ ...detail }) : undefined}
+        />
+      )}
+      {editing && (
+        <ProductFormModal initial={editing} categories={categories} onSave={handleSave} onClose={() => setEditing(null)} />
       )}
     </div>
   )
