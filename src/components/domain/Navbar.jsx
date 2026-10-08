@@ -1,11 +1,20 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useTheme } from "../../contexts/ThemeContext";
+import { useAuth } from "../../contexts/AuthContext";
+import { Button } from "../ui/Button";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { NAV_ITEMS, APP_NAME } from "../../utils/constants";
 
 export function Navbar() {
   const { theme } = useTheme();
   const C = theme.colors;
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
   return (
     <nav
@@ -110,6 +119,17 @@ export function Navbar() {
         </div>
 
         <ThemeSwitcher />
+
+        {user && (
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ fontSize: 13, fontWeight: 700, color: C.textMuted, whiteSpace: "nowrap" }}>
+              👤 {user.name}
+            </span>
+            <Button variant="secondary" size="sm" onClick={handleLogout}>
+              Keluar
+            </Button>
+          </div>
+        )}
       </div>
     </nav>
   );

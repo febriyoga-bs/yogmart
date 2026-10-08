@@ -7,11 +7,35 @@ const api = axios.create({
   timeout: 30000,
 });
 
+export const TOKEN_KEY = "yogmart-token";
+export const AUTH_LOGOUT_EVENT = "yogmart:logout";
+
+// Request interceptor — sertakan token login
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem(TOKEN_KEY);
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
 // Response interceptor
 api.interceptors.response.use(
   (response) => response.data,
-  (error) => Promise.reject(error)
+  (error) => {
+    // Token invalid / kadaluarsa -> paksa logout (kecuali saat percobaan login itu sendiri)
+    if (error.response?.status === 401 && !error.config?.url?.includes("/auth/login")) {
+      localStorage.removeItem(TOKEN_KEY);
+      window.dispatchEvent(new Event(AUTH_LOGOUT_EVENT));
+    }
+    return Promise.reject(error);
+  }
 );
+
+// Auth API
+export const authAPI = {
+  login: (username, password) => api.post("/auth/login", { username, password }),
+
+  me: () => api.get("/auth/me"),
+};
 
 // Products API
 export const productAPI = {
@@ -20,6 +44,8 @@ export const productAPI = {
   getById: (id) => api.get(`/products/${id}`),
 
   getByBarcode: (barcode) => api.get(`/products/barcode/${barcode}`),
+
+  getLogs: (id) => api.get(`/products/${id}/logs`),
 
   create: (data) => api.post("/products", data, {
     headers: { 'Content-Type': 'multipart/form-data' }

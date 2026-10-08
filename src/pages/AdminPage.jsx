@@ -2,12 +2,12 @@ import { useState } from 'react'
 import { useTheme } from '../contexts/ThemeContext'
 import { useToast } from '../contexts/ToastContext'
 import { useProductFilter } from '../hooks/useProductFilter'
-import { formatPrice } from '../utils/formatters'
+import { formatPrice, formatDateTime } from '../utils/formatters'
 import {
   Card, Tabs, SearchBar, Select, Button, EmptyState, ConfirmDialog
 } from '../components/ui'
 import {
-  StatCard, StockBadge, ProductFormModal, CategoryForm
+  StatCard, StockBadge, ProductFormModal, ProductHistoryModal, CategoryForm
 } from '../components/domain'
 import { Modal } from '../components/ui/Modal'
 import { useOutletContext } from "react-router-dom";
@@ -36,6 +36,7 @@ export function AdminPage() {
   const [productModal, setProductModal] = useState(null)
   const [catModal, setCatModal] = useState(null)
   const [confirm, setConfirm] = useState(null)
+  const [historyProduct, setHistoryProduct] = useState(null)
 
   const {
     products,
@@ -76,7 +77,7 @@ export function AdminPage() {
       setProductModal(null);
     } catch (err) {
       console.error(err);
-      showToast("Gagal menyimpan produk");
+      showToast(err.response?.data?.message || "Gagal menyimpan produk", "error");
     }
   };
 
@@ -99,7 +100,7 @@ export function AdminPage() {
       setCatModal(null);
     } catch (err) {
       console.error(err);
-      showToast("Gagal menyimpan kategori");
+      showToast(err.response?.data?.message || "Gagal menyimpan kategori", "error");
     }
   };
 
@@ -143,14 +144,14 @@ export function AdminPage() {
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead style={{ background: C.bgMuted }}>
                   <tr>
-                    {['Produk', 'Barcode', 'Kategori', 'Harga', 'Stok', 'Status', ''].map((h, idx) => (
+                    {['Produk', 'Barcode', 'Kategori', 'Harga', 'Stok', 'Status', 'Terakhir Diupdate', ''].map((h, idx) => (
                       <th key={h} style={{ position: (idx === 0) && "sticky", left: (idx === 0) && 0, zIndex: (idx === 0) && 3, background: (idx === 0) && C.bgMuted, padding: '12px 16px', textAlign: 'left', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: C.textMuted, whiteSpace: 'nowrap' }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {filtered.length === 0 ? (
-                    <tr><td colSpan={7}><EmptyState icon="📦" title="Belum ada produk" description="Tambahkan produk pertama" /></td></tr>
+                    <tr><td colSpan={8}><EmptyState icon="📦" title="Belum ada produk" description="Tambahkan produk pertama" /></td></tr>
                   ) : filtered.map((p) => {
                     const cat = getCat(p.category_id)
                     return (
@@ -177,9 +178,20 @@ export function AdminPage() {
                         <td style={{ padding: '12px 16px' }}><span style={{ background: C.bg, fontWeight: 800, color: C.primary }}>{formatPrice(p.price)}</span></td>
                         <td style={{ padding: '12px 16px' }}><span style={{ background: C.bg, fontWeight: 700, color: C.text }}>{p.stock} {p.unit}</span></td>
                         <td style={{ padding: '12px 16px' }}><StockBadge stock={p.stock} /></td>
+                        <td style={{ padding: '12px 16px', whiteSpace: 'nowrap' }}>
+                          {p.updated_at ? (
+                            <>
+                              <div style={{ fontSize: 13, color: C.text }}>{formatDateTime(p.updated_at)}</div>
+                              <div style={{ fontSize: 12, color: C.textMuted }}>oleh {p.updated_by_name ?? '—'}</div>
+                            </>
+                          ) : (
+                            <span style={{ fontSize: 13, color: C.textMuted }}>—</span>
+                          )}
+                        </td>
                         <td style={{ padding: '12px 16px' }}>
                           <div style={{ display: 'flex', gap: 6 }}>
                             <Button variant="ghost" size="xs" onClick={() => setProductModal({ ...p })}>✏️</Button>
+                            <Button variant="ghost" size="xs" onClick={() => setHistoryProduct(p)}>🕓</Button>
                             {/* <Button variant="danger" size="xs" onClick={() => setConfirm({
                               title: 'Hapus Produk',
                               message: `Yakin menghapus "${p.name}"? Tindakan ini tidak bisa dibatalkan.`,
@@ -241,6 +253,9 @@ export function AdminPage() {
       {/* Modals */}
       {productModal && (
         <ProductFormModal initial={productModal} categories={categories} onSave={saveProduct} onClose={() => setProductModal(null)} />
+      )}
+      {historyProduct && (
+        <ProductHistoryModal product={historyProduct} categories={categories} onClose={() => setHistoryProduct(null)} />
       )}
       {catModal && (
         <Modal title={catModal.id ? 'Edit Kategori' : 'Tambah Kategori'} onClose={() => setCatModal(null)} width={400}>
