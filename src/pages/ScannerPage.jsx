@@ -5,7 +5,7 @@ import { useTheme } from '../contexts/ThemeContext'
 import { useAuth } from '../contexts/AuthContext'
 import { useSaveProduct } from '../hooks/useSaveProduct'
 import { Card, Button, Input, Divider, Spinner, PageHero, Modal } from '../components/ui'
-import { ProductFormModal } from '../components/domain'
+import { ProductFormModal, AlfagiftCompare } from '../components/domain'
 import { formatPrice } from '../utils/formatters'
 import { EMPTY_PRODUCT } from '../utils/constants'
 import { getProductImage } from '../utils/productImage'
@@ -307,6 +307,8 @@ export function ScannerPage() {
                     </div>
                   </div>
                 </div>
+
+                <AlfagiftCompare product={result} />
               </div>
             </Card>
             <Button onClick={() => { reset(); startCamera() }} fullWidth size="lg" icon={<ScanLine size={18} />}>Scan Lagi</Button>

@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { ImagePlus, Trash2 } from 'lucide-react'
+import { ImagePlus, Trash2, ExternalLink } from 'lucide-react'
 import { useTheme } from '../../contexts/ThemeContext'
 import { Modal } from '../ui/Modal'
 import { Input, Select, Textarea } from '../ui/Input'
@@ -7,9 +7,11 @@ import { Button } from '../ui/Button'
 import { validateProduct, isFormValid } from '../../utils/validators'
 import { UNIT_OPTIONS } from '../../utils/constants'
 import { getProductImage } from '../../utils/productImage'
+import { alfagiftSearchUrl } from '../../utils/alfagift'
+import { formatDate } from '../../utils/formatters'
 
 // Field yang dikirim ke backend (sisanya — image_url, updated_at, category_name, dst — hanya untuk tampilan)
-const PAYLOAD_FIELDS = ['id', 'name', 'barcode', 'price', 'stock', 'unit', 'category_id', 'description']
+const PAYLOAD_FIELDS = ['id', 'name', 'barcode', 'price', 'stock', 'unit', 'category_id', 'description', 'alfagift_price']
 
 /**
  * Modal form tambah / edit produk
@@ -23,7 +25,11 @@ export function ProductFormModal({ initial, categories, onSave, onClose }) {
   const { theme } = useTheme()
   const C = theme.colors
   const fileRef = useRef(null)
-  const [form, setForm] = useState({ ...initial })
+  // NUMERIC dari Postgres datang sebagai string "8000.00"
+  const [form, setForm] = useState({
+    ...initial,
+    alfagift_price: initial.alfagift_price != null && initial.alfagift_price !== '' ? Number(initial.alfagift_price) : '',
+  })
   const [saving, setSaving] = useState(false)
   const [errors, setErrors] = useState({})
   const [imageFile, setImageFile] = useState(null)
@@ -190,6 +196,27 @@ export function ProductFormModal({ initial, categories, onSave, onClose }) {
               <option key={u} value={u}>{u}</option>
             ))}
           </Select>
+        </div>
+
+        {/* Harga pembanding Alfagift (opsional, diisi manual) */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <Input
+            label="Harga Alfagift (Rp)"
+            type="number"
+            inputMode="numeric"
+            min="0"
+            value={form.alfagift_price ?? ''}
+            onChange={(e) => set('alfagift_price', e.target.value)}
+            placeholder="Opsional — untuk perbandingan harga"
+            helper={initial.alfagift_checked_at ? `Terakhir dicek ${formatDate(initial.alfagift_checked_at)}` : undefined}
+          />
+          <a
+            href={alfagiftSearchUrl(form.name)}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 700, color: C.primary, pointerEvents: form.name?.trim() ? 'auto' : 'none', opacity: form.name?.trim() ? 1 : 0.4 }}>
+            Cek harga "{form.name?.trim() || 'nama produk'}" di Alfagift <ExternalLink size={14} />
+          </a>
         </div>
 
         <Textarea

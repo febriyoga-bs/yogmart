@@ -14,6 +14,7 @@ const FIELD_LABELS = {
   description: 'Deskripsi',
   barcode: 'Barcode',
   image_url: 'Gambar',
+  alfagift_price: 'Harga Alfagift',
 }
 
 const ACTION_LABELS = {
@@ -43,7 +44,7 @@ export function ProductHistoryModal({ product, categories, onClose }) {
 
   const formatValue = (field, value) => {
     if (value === null || value === undefined || value === '') return '—'
-    if (field === 'price') return formatPrice(value)
+    if (field === 'price' || field === 'alfagift_price') return formatPrice(value)
     if (field === 'category_id') {
       const cat = categories.find((c) => c.id === value)
       return cat ? `${cat.icon} ${cat.name}` : value

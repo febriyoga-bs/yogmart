@@ -1,7 +1,7 @@
 import { useTheme } from '../contexts/ThemeContext'
 import { useProductFilter } from '../hooks/useProductFilter'
 import { SearchBar, FilterPill, EmptyState, PageHero, Skeleton } from '../components/ui'
-import { ProductCard } from '../components/domain'
+import { ProductCard, ProductDetailModal } from '../components/domain'
 import { useState } from 'react'
 import { useOutletContext } from "react-router-dom";
 import { APP_NAME } from '../utils/constants'
@@ -14,6 +14,7 @@ export function CatalogPage() {
   const C = theme.colors
   const [search, setSearch] = useState('')
   const [categoryId, setCategoryId] = useState('')
+  const [detail, setDetail] = useState(null)
 
   const {
     products,
@@ -75,12 +76,16 @@ export function CatalogPage() {
           <div className="tk-product-grid">
             {filtered.map((p, i) => (
               <div key={p.id} style={{ animation: `tk-fadeIn 0.4s ${Math.min(i, 12) * 0.03}s both` }}>
-                <ProductCard product={p} category={getCat(p.category_id)} />
+                <ProductCard product={p} category={getCat(p.category_id)} onClick={() => setDetail(p)} />
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {detail && (
+        <ProductDetailModal product={detail} category={getCat(detail.category_id)} onClose={() => setDetail(null)} />
+      )}
     </div>
   )
 }
