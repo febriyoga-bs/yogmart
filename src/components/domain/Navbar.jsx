@@ -38,7 +38,7 @@ export function Navbar() {
         <div className="tk-container" style={{ display: "flex", alignItems: "center", gap: 12, height: 60 }}>
           {/* Logo */}
           <NavLink to="/" style={{ display: "flex", alignItems: "center", gap: 10, marginRight: "auto", textDecoration: "none", minWidth: 0 }}>
-            <img src="/image/icon.png" width={36} height={36} alt="" style={{ borderRadius: 10, flexShrink: 0 }} />
+            <img src="/icon.svg" width={36} height={36} alt="" style={{ flexShrink: 0 }} />
             <div style={{ minWidth: 0 }}>
               <div style={{ fontWeight: 800, fontSize: 15, color: C.text, lineHeight: 1.15, whiteSpace: "nowrap" }}>{APP_NAME}</div>
               <div style={{ fontSize: 11, color: C.textMuted, fontWeight: 600 }}>Katalog Digital</div>
