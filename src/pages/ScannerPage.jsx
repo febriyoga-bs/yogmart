@@ -1,4 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
+import { Smartphone, CircleCheck } from 'lucide-react'
+import { CategoryIcon } from '../components/domain/CategoryIcon'
 import { useNavigate, useOutletContext, useSearchParams } from 'react-router-dom'
 import { ScanLine, Search, RotateCcw, CameraOff, PackagePlus, PackageSearch, LogIn } from 'lucide-react'
 import { useTheme } from '../contexts/ThemeContext'
@@ -163,12 +165,12 @@ export function ScannerPage() {
     navigate('/login', { state: { from: `/scanner?add=${encodeURIComponent(loginPrompt)}` } })
   }
 
-  const getCatIcon = (catId) => categories.find((c) => c.id === catId)?.icon ?? '📦'
+  const getCatIcon = (catId) => <CategoryIcon icon={categories.find((c) => c.id === catId)?.icon} size={56} color="rgba(255,255,255,0.85)" />
 
   return (
     <div>
       <PageHero
-        eyebrow="📱 Cek Harga"
+        eyebrow={<><Smartphone size={12} /> Cek Harga</>}
         title="Scan Barcode"
         subtitle="Arahkan kamera ke barcode atau ketik kodenya"
         align="center"
@@ -284,7 +286,7 @@ export function ScannerPage() {
               </div>
               <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 14, borderTop: `1px solid ${C.border}` }}>
                 <div>
-                  <div style={{ fontSize: 12, color: C.success, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>✓ Ditemukan</div>
+                  <div style={{ fontSize: 12, color: C.success, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 5 }}><CircleCheck size={14} /> Ditemukan</div>
                   <h2 style={{ fontSize: 22, fontWeight: 800, color: C.text, lineHeight: 1.25 }}>{result.name}</h2>
                   {result.description && <p style={{ fontSize: 14, color: C.textMuted, marginTop: 4 }}>{result.description}</p>}
                 </div>

@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useCallback } from 'react'
 import { generateId } from '../utils/formatters'
 import { useTheme } from './ThemeContext'
+import { CircleCheck, CircleX, TriangleAlert, Info } from 'lucide-react'
 
 // ─── Context ──────────────────────────────────────────────────────────────────
 const ToastContext = createContext(null)
@@ -10,7 +11,12 @@ function ToastItem({ toast, onDismiss }) {
   const { theme } = useTheme()
   const C = theme.colors
 
-  const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' }
+  const icons = {
+    success: <CircleCheck size={18} color={C.success} />,
+    error:   <CircleX size={18} color={C.danger} />,
+    warning: <TriangleAlert size={18} color={C.warning} />,
+    info:    <Info size={18} color={C.info} />,
+  }
   const borders = {
     success: C.successBg,
     error:   C.dangerBg,
@@ -33,7 +39,7 @@ function ToastItem({ toast, onDismiss }) {
       maxWidth:      '100%',
       width:         360,
     }}>
-      <span style={{ fontSize: 18 }}>{icons[toast.type] ?? '💬'}</span>
+      <span style={{ display: 'flex', flexShrink: 0 }}>{icons[toast.type] ?? icons.info}</span>
       <span style={{ fontSize: 14, fontWeight: 600, color: C.text, flex: 1 }}>
         {toast.message}
       </span>

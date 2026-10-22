@@ -1,4 +1,6 @@
 import { useTheme } from '../contexts/ThemeContext'
+import { ShoppingCart, LayoutGrid, SearchX } from 'lucide-react'
+import { CategoryIcon } from '../components/domain/CategoryIcon'
 import { useProductFilter } from '../hooks/useProductFilter'
 import { SearchBar, FilterPill, EmptyState, PageHero, Skeleton } from '../components/ui'
 import { ProductCard, ProductDetailModal, ProductFormModal } from '../components/domain'
@@ -38,7 +40,7 @@ export function CatalogPage() {
   return (
     <div>
       <PageHero
-        eyebrow={`🛒 ${APP_NAME}`}
+        eyebrow={<><ShoppingCart size={12} /> {APP_NAME}</>}
         title="Katalog Belanja"
         subtitle="Temukan semua kebutuhan sehari-hari dengan harga terbaik"
       >
@@ -53,12 +55,12 @@ export function CatalogPage() {
         background: `${C.bg}f0`, backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
       }}>
         <div className="tk-container tk-hide-scrollbar" style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingTop: 12, paddingBottom: 12 }}>
-          <FilterPill label="Semua" icon="✨" active={!categoryId} onClick={() => setCategoryId('')} />
+          <FilterPill label="Semua" icon={<LayoutGrid size={14} />} active={!categoryId} onClick={() => setCategoryId('')} />
           {categories.map((c) => (
             <FilterPill
               key={c.id}
               label={c.name}
-              icon={c.icon}
+              icon={<CategoryIcon icon={c.icon} size={14} />}
               active={categoryId === c.id}
               onClick={() => setCategoryId(categoryId === c.id ? '' : c.id)}
             />
@@ -79,7 +81,7 @@ export function CatalogPage() {
           </div>
         ) : isEmpty ? (
           <EmptyState
-            icon="🔍"
+            icon={<SearchX size={44} strokeWidth={1.5} />}
             title="Produk tidak ditemukan"
             description="Coba ubah kata kunci atau pilih kategori lain"
           />

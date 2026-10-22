@@ -9,7 +9,6 @@ export const THEMES = {
   light: {
     name: 'light',
     label: 'Light',
-    icon: '☀️',
     colors: {
       primary: '#070047',
       primaryLight: '#40577b',
@@ -42,7 +41,6 @@ export const THEMES = {
   dawn: {
     name: 'dawn',
     label: 'Dawn',
-    icon: '🌅',
     colors: {
       primary: '#9d4a2c',
       primaryLight: '#b85c3a',
@@ -75,7 +73,6 @@ export const THEMES = {
   dark: {
     name: 'dark',
     label: 'Dark',
-    icon: '🌙',
     colors: {
       // Brand
       primary: '#3B82F6',
@@ -128,9 +125,11 @@ export const THEMES = {
 // ─── Category Icons ───────────────────────────────────────────────────────────
 
 export const CATEGORY_ICONS = [
-  '🍜', '🌾', '🧼', '💊', '🍿', '🚬',
-  '🥤', '🧃', '🍫', '🧂', '🫙', '📦',
-  '🛒', '🏠', '✂️', '🧹', '🎯', '🧴',
+  // key ikon Lucide, lihat components/domain/CategoryIcon.jsx
+  'ice-cream', 'drink', 'juice', 'milk', 'coffee', 'bread',
+  'rice', 'noodle', 'snack', 'cookie', 'candy', 'egg',
+  'food', 'medicine', 'cigarette', 'cleaning', 'toiletries', 'broom',
+  'baby', 'gas', 'household', 'tools', 'groceries', 'other',
 ]
 
 // ─── Stock Thresholds ─────────────────────────────────────────────────────────
@@ -153,19 +152,19 @@ export const EMPTY_PRODUCT = { name: '', barcode: '', price: '', stock: '', unit
 // ─── Nav Items ────────────────────────────────────────────────────────────────
 
 export const NAV_ITEMS = [
-  { id: 'catalog', label: 'Katalog', path: "/", icon: '🛒' },
-  { id: 'scan', label: 'Cek Harga', path: "/scanner", icon: '📱' },
-  { id: 'admin', label: 'Dashboard', path: "/admin", icon: '⚙️' },
+  { id: 'catalog', label: 'Katalog', path: "/" },
+  { id: 'scan', label: 'Cek Harga', path: "/scanner" },
+  { id: 'admin', label: 'Dashboard', path: "/admin" },
 ]
 
 // ─── Mock Seed Data ───────────────────────────────────────────────────────────
 
 export const SEED_CATEGORIES = [
-  { id: 'cat-1', name: 'Makanan & Minuman', icon: '🍜' },
-  { id: 'cat-2', name: 'Sembako', icon: '🌾' },
-  { id: 'cat-3', name: 'Kebersihan', icon: '🧼' },
-  { id: 'cat-4', name: 'Kesehatan', icon: '💊' },
-  { id: 'cat-5', name: 'Snack', icon: '🍿' },
+  { id: 'cat-1', name: 'Makanan & Minuman', icon: 'noodle' },
+  { id: 'cat-2', name: 'Sembako', icon: 'rice' },
+  { id: 'cat-3', name: 'Kebersihan', icon: 'cleaning' },
+  { id: 'cat-4', name: 'Kesehatan', icon: 'medicine' },
+  { id: 'cat-5', name: 'Snack', icon: 'snack' },
 ]
 
 export const SEED_PRODUCTS = [

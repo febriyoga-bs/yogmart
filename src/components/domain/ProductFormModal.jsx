@@ -162,7 +162,7 @@ export function ProductFormModal({ initial, categories, onSave, onClose }) {
             onChange={(e) => set('category_id', e.target.value)}>
             <option value="">-- Pilih --</option>
             {categories.map((c) => (
-              <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
+              <option key={c.id} value={c.id}>{c.name}</option>
             ))}
           </Select>
 

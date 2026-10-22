@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { Save } from 'lucide-react'
+import { CategoryIcon } from './CategoryIcon'
 import { useTheme } from '../../contexts/ThemeContext'
 import { Input } from '../ui/Input'
 import { Button } from '../ui/Button'
@@ -38,13 +40,17 @@ export function CategoryForm({ initial, onSave, onClose }) {
               key={icon}
               type="button"
               onClick={() => setForm({ ...form, icon })}
+              aria-label={icon}
+              title={icon}
               style={{
-                width: 40, height: 40, borderRadius: 8, fontSize: 20, cursor: 'pointer',
+                width: 40, height: 40, borderRadius: 8, cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: form.icon === icon ? C.primary : C.textMuted,
                 fontFamily: 'inherit', transition: 'all 0.15s',
                 border: `2px solid ${form.icon === icon ? C.primary : C.border}`,
                 background: form.icon === icon ? C.primaryAlpha : C.bgCard,
               }}>
-              {icon}
+              <CategoryIcon icon={icon} size={20} />
             </button>
           ))}
         </div>
@@ -52,8 +58,8 @@ export function CategoryForm({ initial, onSave, onClose }) {
 
       <div style={{ display: 'flex', gap: 10 }}>
         <Button variant="secondary" onClick={onClose} fullWidth>Batal</Button>
-        <Button onClick={() => onSave(form)} disabled={!form.name.trim()} fullWidth>
-          💾 Simpan
+        <Button onClick={() => onSave(form)} disabled={!form.name.trim()} fullWidth icon={<Save size={16} />}>
+          Simpan
         </Button>
       </div>
     </div>

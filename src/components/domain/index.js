@@ -1,5 +1,6 @@
 // ─── Domain Components — barrel export ───────────────────────────────────────
 export { CategoryForm }      from './CategoryForm'
+export { CategoryIcon }      from './CategoryIcon'
 export { Navbar }            from './Navbar'
 export { ProductCard }       from './ProductCard'
 export { ProductFormModal }  from './ProductFormModal'

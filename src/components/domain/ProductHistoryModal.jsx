@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { FilePlus, Pencil, Trash2, History } from 'lucide-react'
 import { useTheme } from '../../contexts/ThemeContext'
 import { productAPI } from '../../api'
 import { formatDateTime, formatPrice } from '../../utils/formatters'
@@ -18,9 +19,9 @@ const FIELD_LABELS = {
 }
 
 const ACTION_LABELS = {
-  create: { text: 'Dibuat', icon: '🆕' },
-  update: { text: 'Diubah', icon: '✏️' },
-  delete: { text: 'Dihapus', icon: '🗑️' },
+  create: { text: 'Dibuat', Icon: FilePlus },
+  update: { text: 'Diubah', Icon: Pencil },
+  delete: { text: 'Dihapus', Icon: Trash2 },
 }
 
 /**
@@ -47,7 +48,7 @@ export function ProductHistoryModal({ product, categories, onClose }) {
     if (field === 'price' || field === 'alfagift_price') return formatPrice(value)
     if (field === 'category_id') {
       const cat = categories.find((c) => c.id === value)
-      return cat ? `${cat.icon} ${cat.name}` : value
+      return cat ? cat.name : value
     }
     if (field === 'image_url') return 'gambar baru'
     return String(value)
@@ -62,16 +63,16 @@ export function ProductHistoryModal({ product, categories, onClose }) {
           <Spinner size={28} color={C.primary} />
         </div>
       ) : logs.length === 0 ? (
-        <EmptyState icon="🕓" title="Belum ada riwayat" description="Perubahan produk akan tercatat di sini" />
+        <EmptyState icon={<History size={44} strokeWidth={1.5} />} title="Belum ada riwayat" description="Perubahan produk akan tercatat di sini" />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {logs.map((log) => {
-            const action = ACTION_LABELS[log.action] ?? { text: log.action, icon: '•' }
+            const action = ACTION_LABELS[log.action] ?? { text: log.action, Icon: Pencil }
             const entries = Object.entries(log.changes ?? {})
             return (
               <div key={log.id} style={{ border: `1px solid ${C.border}`, borderRadius: 12, padding: '12px 14px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                  <span>{action.icon}</span>
+                  <action.Icon size={16} color={C.textMuted} style={{ flexShrink: 0 }} />
                   <span style={{ fontWeight: 800, fontSize: 14, color: C.text }}>{action.text}</span>
                   <span style={{ fontSize: 13, color: C.textMuted }}>oleh <b style={{ color: C.text }}>{log.user_name ?? '—'}</b></span>
                   <span style={{ marginLeft: 'auto', fontSize: 12, color: C.textMuted }}>{formatDateTime(log.created_at)}</span>

@@ -1,4 +1,5 @@
 import { useTheme } from '../../contexts/ThemeContext'
+import { CategoryIcon } from './CategoryIcon'
 import { Card } from '../ui/Card'
 import { StockBadge } from './StockBadge'
 import { formatPrice } from '../../utils/formatters'
@@ -27,7 +28,7 @@ export function ProductCard({ product, category, onClick }) {
       }}>
         {image
           ? <img src={image} alt={product.name} loading="lazy" style={{ position: 'absolute', inset: 10, width: 'calc(100% - 20px)', height: 'calc(100% - 20px)', objectFit: 'contain' }} />
-          : category?.icon ?? '📦'}
+          : <CategoryIcon icon={category?.icon} size={44} color={C.textLight} />}
 
         {/* Badge stok di pojok — hanya kalau menipis / habis */}
         {product.stock < STOCK_THRESHOLD_LOW && (
@@ -45,7 +46,7 @@ export function ProductCard({ product, category, onClick }) {
       <div style={{ padding: '12px 14px 14px', flex: 1, display: 'flex', flexDirection: 'column', gap: 4, borderTop: `1px solid ${C.border}` }}>
         {category && (
           <div style={{ fontSize: 11, color: C.textMuted, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {category.icon} {category.name}
+            <CategoryIcon icon={category.icon} size={12} style={{ verticalAlign: '-1px' }} /> {category.name}
           </div>
         )}
 

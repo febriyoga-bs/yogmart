@@ -1,4 +1,5 @@
 import { Pencil } from 'lucide-react'
+import { CategoryIcon } from './CategoryIcon'
 import { useTheme } from '../../contexts/ThemeContext'
 import { formatPrice } from '../../utils/formatters'
 import { getProductImage } from '../../utils/productImage'
@@ -36,12 +37,12 @@ export function ProductDetailModal({ product, category, onClose, onEdit }) {
         <div style={{ aspectRatio: '16 / 10', background: '#fff', borderRadius: 16, border: `1px solid ${C.border}`, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 64 }}>
           {image
             ? <img src={image} alt={product.name} style={{ position: 'absolute', inset: 14, width: 'calc(100% - 28px)', height: 'calc(100% - 28px)', objectFit: 'contain' }} />
-            : category?.icon ?? '📦'}
+            : <CategoryIcon icon={category?.icon} size={56} color={C.textLight} />}
         </div>
 
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12 }}>
           <div>
-            {category && <div style={{ fontSize: 12, color: C.textMuted, fontWeight: 700 }}>{category.icon} {category.name}</div>}
+            {category && <div style={{ fontSize: 12, color: C.textMuted, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5 }}><CategoryIcon icon={category.icon} size={13} /> {category.name}</div>}
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 2 }}>
               <span style={{ fontSize: 28, fontWeight: 800, color: C.primary, letterSpacing: '-0.02em' }}>{formatPrice(product.price)}</span>
               <span style={{ fontSize: 13, color: C.textMuted }}>/{product.unit}</span>

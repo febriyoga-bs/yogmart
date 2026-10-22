@@ -1,6 +1,7 @@
 import { useState } from 'react'
+import { CategoryIcon } from '../components/domain/CategoryIcon'
 import { useOutletContext } from "react-router-dom";
-import { Plus, Pencil, History, Trash2 } from 'lucide-react'
+import { Plus, Pencil, History, Trash2, Package, Tags, Wallet, TriangleAlert, Settings } from 'lucide-react'
 import { useTheme } from '../contexts/ThemeContext'
 import { useToast } from '../contexts/ToastContext'
 import { useAuth } from '../contexts/AuthContext'
@@ -20,11 +21,11 @@ import { categoryAPI } from "../api";
 
 
 const ADMIN_TABS = [
-  { id: 'products', label: 'Produk', icon: '📦' },
-  { id: 'categories', label: 'Kategori', icon: '🏷️' },
+  { id: 'products', label: 'Produk', icon: <Package size={16} /> },
+  { id: 'categories', label: 'Kategori', icon: <Tags size={16} /> },
 ]
 
-const EMPTY_CATEGORY = { name: '', icon: '📦' }
+const EMPTY_CATEGORY = { name: '', icon: 'other' }
 
 const iconButton = (C) => ({
   width: 36, height: 36, borderRadius: 10, border: `1px solid ${C.border}`,
@@ -109,7 +110,7 @@ export function AdminPage() {
       <div style={{ width: size, height: size, borderRadius: 12, background: '#fff', border: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: size * 0.45, flexShrink: 0, overflow: 'hidden' }}>
         {src
           ? <img src={src} alt={p.name} loading="lazy" style={{ width: '85%', height: '85%', objectFit: 'contain' }} />
-          : getCat(p.category_id)?.icon ?? '📦'}
+          : <CategoryIcon icon={getCat(p.category_id)?.icon} size={size * 0.5} color={C.textLight} />}
       </div>
     )
   }
@@ -121,7 +122,7 @@ export function AdminPage() {
   return (
     <div>
       <PageHero
-        eyebrow="⚙️ Admin Panel"
+        eyebrow={<><Settings size={12} /> Admin Panel</>}
         title="Dashboard Warung"
         subtitle={user ? `Halo, ${user.name}! Kelola produk dan kategori di sini.` : undefined}
       />
@@ -129,10 +130,10 @@ export function AdminPage() {
       <div className="tk-container" style={{ paddingTop: 20, paddingBottom: 28 }}>
         {/* Stats */}
         <div className="tk-stats-grid" style={{ marginBottom: 22 }}>
-          <StatCard label="Total Produk" value={stats.total} icon="📦" variant="primary" />
-          <StatCard label="Kategori" value={stats.cats} icon="🏷️" variant="info" />
-          <StatCard label="Nilai Stok" value={formatPrice(stats.value)} icon="💰" variant="success" />
-          <StatCard label="Stok Menipis" value={stats.low} icon="⚠️" variant={stats.low > 0 ? 'warning' : 'neutral'} />
+          <StatCard label="Total Produk" value={stats.total} icon={<Package size={20} />} variant="primary" />
+          <StatCard label="Kategori" value={stats.cats} icon={<Tags size={20} />} variant="info" />
+          <StatCard label="Nilai Stok" value={formatPrice(stats.value)} icon={<Wallet size={20} />} variant="success" />
+          <StatCard label="Stok Menipis" value={stats.low} icon={<TriangleAlert size={20} />} variant={stats.low > 0 ? 'warning' : 'neutral'} />
         </div>
 
         <Tabs tabs={ADMIN_TABS} active={tab} onChange={setTab} />
@@ -147,7 +148,7 @@ export function AdminPage() {
               </div>
               <Select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} style={{ height: 46, borderRadius: 14, minWidth: 150 }}>
                 <option value="">Semua Kategori</option>
-                {categories.map((c) => <option key={c.id} value={c.id}>{c.icon} {c.name}</option>)}
+                {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
               </Select>
               {!isMobile && (
                 <Button icon={<Plus size={18} />} onClick={() => setProductModal(EMPTY_PRODUCT)} style={{ height: 46 }}>Tambah Produk</Button>
@@ -155,7 +156,7 @@ export function AdminPage() {
             </div>
 
             {filtered.length === 0 ? (
-              <Card><EmptyState icon="📦" title="Belum ada produk" description="Tambahkan produk pertama" /></Card>
+              <Card><EmptyState title="Belum ada produk" description="Tambahkan produk pertama" /></Card>
             ) : isMobile ? (
               /* ── Mobile: daftar kartu ── */
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10, paddingBottom: 64 }}>
@@ -213,7 +214,7 @@ export function AdminPage() {
                             </div>
                           </td>
                           <td style={{ padding: '10px 16px', fontFamily: 'monospace', fontSize: 13, color: C.textMuted }}>{p.barcode}</td>
-                          <td style={{ padding: '10px 16px', fontSize: 13, color: C.text, whiteSpace: 'nowrap' }}>{cat?.icon} {cat?.name ?? '-'}</td>
+                          <td style={{ padding: '10px 16px', fontSize: 13, color: C.text, whiteSpace: 'nowrap' }}><span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>{cat && <CategoryIcon icon={cat.icon} size={14} color={C.textMuted} />}{cat?.name ?? '-'}</span></td>
                           <td style={{ padding: '10px 16px', fontWeight: 800, color: C.primary, whiteSpace: 'nowrap' }}>{formatPrice(p.price)}</td>
                           <td style={{ padding: '10px 16px', whiteSpace: 'nowrap' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -281,7 +282,7 @@ export function AdminPage() {
                   <Card key={cat.id} padding="sm" style={{ borderRadius: 16 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                       <div style={{ width: 48, height: 48, borderRadius: 14, background: C.bgMuted, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, flexShrink: 0 }}>
-                        {cat.icon}
+                        <CategoryIcon icon={cat.icon} size={22} color={C.text} />
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontWeight: 800, fontSize: 15, color: C.text }}>{cat.name}</div>

@@ -1,5 +1,8 @@
 import { useTheme } from '../../contexts/ThemeContext'
 import { THEMES } from '../../utils/constants'
+import { Sun, Sunrise, Moon } from 'lucide-react'
+
+const THEME_ICONS = { light: Sun, dawn: Sunrise, dark: Moon }
 
 /**
  * Tombol switcher tema Light / Dawn / Dark
@@ -24,7 +27,7 @@ export function ThemeSwitcher({ compact = false }) {
           background: C.bgMuted, cursor: 'pointer', fontSize: 18,
           display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
         }}>
-        {theme.icon}
+        {(() => { const Icon = THEME_ICONS[theme.name] ?? Sun; return <Icon size={18} color={C.text} /> })()}
       </button>
     )
   }
@@ -39,12 +42,13 @@ export function ThemeSwitcher({ compact = false }) {
           aria-label={`Tema ${t.label}`}
           style={{
             width: 34, height: 34, borderRadius: 9, border: 'none', cursor: 'pointer',
-            fontSize: 16, transition: 'all 0.2s',
+            fontSize: 16, transition: 'all 0.2s', color: C.text,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
             background: themeName === t.name ? C.bgCard : 'transparent',
             boxShadow: themeName === t.name ? C.shadow : 'none',
             opacity: themeName === t.name ? 1 : 0.6,
           }}>
-          {t.icon}
+          {(() => { const Icon = THEME_ICONS[t.name] ?? Sun; return <Icon size={16} /> })()}
         </button>
       ))}
     </div>
